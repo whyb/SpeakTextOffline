@@ -358,9 +358,9 @@
             // 合并连续的空行
             text = text.replace(/\n{2,}/g, '\n');
 
-            // 改进的句子分割正则表达式
-            const sentenceRegex = /[^\r\n。！？]+(?:[。！？]|$)/g;
-            const newSentences = text.match(sentenceRegex) || [text];
+            // 改进的句子分割正则表达式，同时处理中英文
+            const sentenceRegex = /(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<![A-Z]\.)(?<=[。！？\.?!；;])(?:\s|\n|$)/g;
+            const newSentences = text.split(sentenceRegex);
 
             newSentences.forEach(sentence => {
                 // 去除句子前后的中英文空格
