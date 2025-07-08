@@ -178,7 +178,7 @@
                     <p class="text-gray-400 text-sm mt-1">让朗读更加便捷 | Powered by AI</p>
                 </div>
                 <div class="flex space-x-4">
-                    <a href="https://github.com/whyb/SpeakTextOffline" class="text-gray-400 hover:text-white transition-colors">
+                    <a href="https://github.com/whyb/SpeakTextOffline" target="_blank" class="text-gray-400 hover:text-white transition-colors">
                         <i class="fa fa-github text-xl"></i>
                     </a>
                 </div>
@@ -262,33 +262,40 @@
         function loadVoices() {
             voices = speechSynthesis.getVoices();
             voiceSelect.innerHTML = '';
-            
+
+            // 添加日志确认语音加载
+            console.log('Available voices:', voices);
+
             // 过滤并排序语音
-            const filteredVoices = voices.filter(voice => {
-                // 只保留中文和英文语音
-                return voice.lang.startsWith('zh') || voice.lang.startsWith('en');
-            }).sort((a, b) => {
+            const filteredVoices = voices.sort((a, b) => {
                 // 按语言和名称排序
                 return a.lang.localeCompare(b.lang) || a.name.localeCompare(b.name);
             });
-            
+
             // 添加语音选项
             if (filteredVoices.length > 0) {
+                let firstChineseVoiceIndex = -1;
                 filteredVoices.forEach((voice, index) => {
                     const option = document.createElement('option');
                     const voiceName = `${voice.name} (${voice.lang})`;
-                    
+
                     option.textContent = voiceName;
                     option.value = index;
-                    
-                    // 默认选择第一个中文语音或第一个语音
-                    if ((voice.lang.startsWith('zh') && index === 0) || 
-                        (index === 0 && !filteredVoices.some(v => v.lang.startsWith('zh')))) {
-                        option.selected = true;
+
+                    // 记录第一个包含 zh-CN 的语音的索引
+                    if (voiceName.includes('zh-CN') && firstChineseVoiceIndex === -1) {
+                        firstChineseVoiceIndex = index;
                     }
-                    
+
                     voiceSelect.appendChild(option);
                 });
+
+                // 如果有包含 zh-CN 的语音，选择第一个包含 zh-CN 的语音；否则选择第一个语音
+                if (firstChineseVoiceIndex !== -1) {
+                    voiceSelect.options[firstChineseVoiceIndex].selected = true;
+                } else {
+                    voiceSelect.options[0].selected = true;
+                }
             } else {
                 voiceSelect.innerHTML = '<option value="">没有可用的语音</option>';
             }
@@ -407,27 +414,27 @@
         function startNewReading() {
             // 重置高亮
             resetHighlight();
-            
+
             // 创建新的语音实例
             const text = outputArea.textContent;
             speechUtterance = new SpeechSynthesisUtterance(text);
-            
+
             // 设置选中的语音
             const selectedVoiceIndex = voiceSelect.value;
             if (selectedVoiceIndex !== '' && voices.length > 0) {
                 speechUtterance.voice = voices[selectedVoiceIndex];
             }
-            
+
             // 设置语速
             speechUtterance.rate = parseFloat(rateInput.value);
-            
+
             // 设置句子边界
             speechUtterance.onboundary = (event) => {
                 if (event.name === 'sentence') {
                     highlightCurrentSentence(event.charIndex, event.charLength);
                 }
             };
-            
+
             // 设置语音完成回调
             speechUtterance.onend = () => {
                 isPlaying = false;
@@ -435,7 +442,7 @@
                 resetHighlight();
                 showNotification('朗读已完成');
             };
-            
+
             // 设置语音错误回调
             speechUtterance.onerror = (e) => {
                 console.error('语音朗读错误:', e);
@@ -444,13 +451,13 @@
                 resetHighlight();
                 showNotification('语音朗读出错，请稍后再试', 'error');
             };
-            
+
             // 开始朗读
             speechSynthesis.speak(speechUtterance);
             isPlaying = true;
             currentSentenceIndex = 0;
             updateButtonStates();
-            
+
             // 初始高亮
             if (sentences.length > 0) {
                 sentences[0].classList.add('highlight');
