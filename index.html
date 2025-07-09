@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文本朗读助手</title>
+    <title data-i18n="appTitle"></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script>
@@ -43,16 +43,36 @@
             }
         }
     </style>
+    <style>
+        #language-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding-right: 2.5rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+        }
+
+        @-moz-document url-prefix() {
+            #language-select {
+                text-indent: 0.01px;
+                text-overflow: '';
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-50 font-sans text-neutral min-h-screen flex flex-col">
-    <!-- 导航栏 -->
     <header class="bg-white shadow-sm sticky top-0 z-50 transition-all duration-300" id="navbar">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-2">
                 <i class="fa fa-volume-up text-primary text-2xl"></i>
-                <h1 class="text-xl md:text-2xl font-bold text-neutral">文本朗读助手</h1>
+                <h1 class="text-xl md:text-2xl font-bold text-neutral" data-i18n="appTitle"></h1>
             </div>
             <div class="flex items-center space-x-4">
+                <select id="language-select" class="px-3 py-2 rounded-lg border border-gray-200 text-gray-700 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none appearance-none bg-white" data-i18n-title="selectLanguage">
+                    </select>
                 <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
                     <i class="fa fa-moon-o text-neutral"></i>
                 </button>
@@ -63,70 +83,62 @@
         </div>
     </header>
 
-    <!-- 主内容区 -->
     <main class="flex-grow container mx-auto px-4 py-8">
-        <!-- 介绍卡片 -->
         <div class="bg-white rounded-xl shadow-md p-6 mb-8 transform hover:scale-[1.01] transition-transform">
             <h2 class="text-xl font-bold mb-4 text-neutral flex items-center">
                 <i class="fa fa-info-circle text-primary mr-2"></i>
-                关于此工具
+                <span data-i18n="aboutToolTitle"></span>
             </h2>
-            <p class="text-gray-600 leading-relaxed">
-                这是一个简单的文本朗读工具，你可以将文本粘贴到下方的输入框中，系统会自动将其添加到朗读区域。
-                使用下方的控制按钮可以开始/暂停朗读、停止朗读内容，还可以选择不同的音色和调整语速。
-            </p>
+            <p class="text-gray-600 leading-relaxed" data-i18n="aboutToolDescription"></p>
         </div>
 
-        <!-- 输入区域 -->
         <div class="bg-white rounded-xl shadow-md p-6 mb-8">
             <h2 class="text-xl font-bold mb-4 text-neutral flex items-center">
                 <i class="fa fa-pencil-square-o text-primary mr-2"></i>
-                输入文本
+                <span data-i18n="inputAreaTitle"></span>
             </h2>
             <div class="relative">
                 <textarea 
                     id="text-input" 
                     class="w-full h-40 p-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all resize-none"
-                    placeholder="请粘贴文本到这里..."></textarea>
+                    data-i18n-placeholder="inputPlaceholder"></textarea>
                 <div class="absolute bottom-4 right-4 text-sm text-gray-400">
-                    <span id="char-count">0</span> 字符
+                    <span id="char-count">0</span> <span data-i18n="characters"></span>
                 </div>
             </div>
             <div class="mt-4 flex gap-3">
                 <button id="add-to-reading" class="px-4 py-2 bg-primary text-white rounded-lg shadow hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all flex items-center">
-                    <i class="fa fa-plus mr-2"></i> 添加到朗读
+                    <i class="fa fa-plus mr-2"></i> <span data-i18n="addToReadingButton"></span>
                 </button>
                 <button id="clear-input" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 focus:ring-2 focus:ring-gray-400/50 focus:outline-none transition-all flex items-center">
-                    <i class="fa fa-eraser mr-2"></i> 清空输入
+                    <i class="fa fa-eraser mr-2"></i> <span data-i18n="clearInputButton"></span>
                 </button>
             </div>
         </div>
 
-        <!-- 朗读控制区 -->
         <div class="bg-white rounded-xl shadow-md p-6 mb-8">
             <h2 class="text-xl font-bold mb-4 text-neutral flex items-center">
                 <i class="fa fa-volume-up text-primary mr-2"></i>
-                朗读控制
+                <span data-i18n="readingControlsTitle"></span>
             </h2>
             <div class="flex flex-wrap gap-4 mb-6">
                 <button id="play-pause-btn" class="px-6 py-3 bg-primary text-white rounded-lg shadow hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all flex items-center">
-                    <i class="fa fa-play mr-2"></i> 开始朗读
+                    <i class="fa fa-play mr-2"></i> <span data-i18n="startReadingButton"></span>
                 </button>
                 <button id="stop-btn" class="px-6 py-3 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 focus:ring-2 focus:ring-red-400/50 focus:outline-none transition-all flex items-center" disabled>
-                    <i class="fa fa-stop mr-2"></i> 停止朗读
+                    <i class="fa fa-stop mr-2"></i> <span data-i18n="stopReadingButton"></span>
                 </button>
                 <button id="reset-btn" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 focus:ring-2 focus:ring-gray-400/50 focus:outline-none transition-all flex items-center" disabled>
-                    <i class="fa fa-refresh mr-2"></i> 重置内容
+                    <i class="fa fa-refresh mr-2"></i> <span data-i18n="resetContentButton"></span>
                 </button>
             </div>
             
-            <!-- 音色和语速控制 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="voice-select" class="block text-gray-700 font-medium mb-2">选择音色</label>
+                    <label for="voice-select" class="block text-gray-700 font-medium mb-2" data-i18n="selectVoiceLabel"></label>
                     <div class="relative">
                         <select id="voice-select" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none appearance-none bg-white">
-                            <option value="">加载中...</option>
+                            <option value="" data-i18n="loadingVoices"></option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
                             <i class="fa fa-chevron-down"></i>
@@ -134,7 +146,7 @@
                     </div>
                 </div>
                 <div>
-                    <label for="rate" class="block text-gray-700 font-medium mb-2">语速</label>
+                    <label for="rate" class="block text-gray-700 font-medium mb-2" data-i18n="speechRateLabel"></label>
                     <div class="flex items-center space-x-2">
                         <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1" 
                             class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary">
@@ -144,38 +156,36 @@
             </div>
         </div>
 
-        <!-- 朗读内容区 -->
         <div class="bg-white rounded-xl shadow-md p-6 mb-8">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-neutral flex items-center">
                     <i class="fa fa-file-text-o text-primary mr-2"></i>
-                    朗读内容
+                    <span data-i18n="readingContentTitle"></span>
                 </h2>
                 <div class="flex space-x-2">
-                    <button id="copy-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600" title="复制内容">
+                    <button id="copy-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600" data-i18n-title="copyContentTitle">
                         <i class="fa fa-copy"></i>
                     </button>
-                    <button id="clear-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600" title="清空内容">
+                    <button id="clear-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600" data-i18n-title="clearContentTitle">
                         <i class="fa fa-trash"></i>
                     </button>
                 </div>
             </div>
             <div id="output-area" class="min-h-32 p-4 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 whitespace-pre-wrap break-words transition-all">
-                <p class="text-gray-400 italic">粘贴的内容将显示在这里...</p>
+                <p class="text-gray-400 italic" data-i18n="outputPlaceholder"></p>
             </div>
         </div>
     </main>
 
-    <!-- 页脚 -->
     <footer class="bg-neutral text-white py-6">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-4 md:mb-0">
                     <div class="flex items-center space-x-2">
                         <i class="fa fa-volume-up text-primary text-xl"></i>
-                        <span class="font-bold text-lg">文本朗读助手</span>
+                        <span class="font-bold text-lg" data-i18n="appTitle"></span>
                     </div>
-                    <p class="text-gray-400 text-sm mt-1">让朗读更加便捷 | Powered by AI</p>
+                    <p class="text-gray-400 text-sm mt-1" data-i18n="footerTagline"></p>
                 </div>
                 <div class="flex space-x-4">
                     <a href="https://github.com/whyb/SpeakTextOffline" target="_blank" class="text-gray-400 hover:text-white transition-colors">
@@ -184,52 +194,48 @@
                 </div>
             </div>
             <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400 text-sm">
-                &copy; 2025 文本朗读助手 | <a href="https://www.github.com/whyb" target="_blank">張小凡Github</a>
+                &copy; <span data-i18n="footerCopyright"></span> | <a href="https://www.github.com/whyb" target="_blank" data-i18n="footerAuthor"></a>
             </div>
         </div>
     </footer>
 
-    <!-- 帮助模态框 -->
     <div id="help-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-xl shadow-lg p-6 max-w-md w-full mx-4 transform transition-all">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-neutral">使用帮助</h3>
+                <h3 class="text-xl font-bold text-neutral" data-i18n="helpModalTitle"></h3>
                 <button id="close-help" class="text-gray-400 hover:text-gray-600">
                     <i class="fa fa-times text-xl"></i>
                 </button>
             </div>
             <div class="space-y-4 text-gray-600">
                 <div>
-                    <h4 class="font-semibold text-neutral">如何使用</h4>
-                    <p>1. 从剪贴板复制文本内容</p>
-                    <p>2. 将文本粘贴到上方的输入框中</p>
-                    <p>3. 点击"添加到朗读"按钮将内容添加到朗读区域</p>
-                    <p>4. 选择喜欢的音色和语速</p>
-                    <p>5. 点击"开始朗读"按钮开始朗读</p>
+                    <h4 class="font-semibold text-neutral" data-i18n="howToUseTitle"></h4>
+                    <p data-i18n="howToUseStep1"></p>
+                    <p data-i18n="howToUseStep2"></p>
+                    <p data-i18n="howToUseStep3"></p>
+                    <p data-i18n="howToUseStep4"></p>
+                    <p data-i18n="howToUseStep5"></p>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-neutral">控制选项</h4>
-                    <p>- 开始/暂停按钮：开始朗读或暂停当前朗读</p>
-                    <p>- 停止朗读：完全停止朗读并重置到开始位置</p>
-                    <p>- 重置内容：清空朗读内容</p>
-                    <p>- 音色选择：选择不同的语音音色</p>
-                    <p>- 语速调整：调整朗读的速度</p>
+                    <h4 class="font-semibold text-neutral">Control Options</h4>
+                    <p data-i18n="controlOptionPlayPause"></p>
+                    <p data-i18n="controlOptionStop"></p>
+                    <p data-i18n="controlOptionReset"></p>
+                    <p data-i18n="controlOptionVoice"></p>
+                    <p data-i18n="controlOptionRate"></p>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-neutral">高亮功能</h4>
-                    <p>在朗读过程中，当前正在朗读的句子会自动高亮显示，方便您跟随阅读。</p>
+                    <h4 class="font-semibold text-neutral" data-i18n="highlightFeatureTitle"></h4>
+                    <p data-i18n="highlightFeatureDescription"></p>
                 </div>
             </div>
             <div class="mt-6">
-                <button id="got-it" class="w-full py-3 bg-primary text-white rounded-lg shadow hover:bg-primary/90 transition-colors">
-                    我知道了
-                </button>
+                <button id="got-it" class="w-full py-3 bg-primary text-white rounded-lg shadow hover:bg-primary/90 transition-colors" data-i18n="gotItButton"></button>
             </div>
         </div>
     </div>
 
     <script>
-        // DOM元素
         const textInput = document.getElementById('text-input');
         const outputArea = document.getElementById('output-area');
         const charCount = document.getElementById('char-count');
@@ -249,32 +255,109 @@
         const voiceSelect = document.getElementById('voice-select');
         const addToReadingBtn = document.getElementById('add-to-reading');
         const clearInputBtn = document.getElementById('clear-input');
+        const languageSelect = document.getElementById('language-select');
 
-        // 语音合成对象
         let speechSynthesis = window.speechSynthesis;
         let speechUtterance = null;
         let isPlaying = false;
         let voices = [];
         let currentSentenceIndex = 0;
         let sentences = [];
+        let translations = {};
 
-        // 加载可用的语音
+        // Mapping of language codes to flag emojis
+        const flagEmojis = {
+            'en': '🇺🇸', // English (US flag, widely recognized)
+            'zh': '🇨🇳', // Chinese (China flag)
+            'es': '🇪🇸', // Spanish (Spain flag)
+            'hi': '🇮🇳', // Hindi (India flag)
+            'ar': '🇸🇦', // Arabic (Saudi Arabia flag, representative)
+            'pt': '🇵🇹', // Portuguese (Portugal flag)
+            'bn': '🇧🇩', // Bengali (Bangladesh flag)
+            'ru': '🇷🇺', // Russian (Russia flag)
+            'ja': '🇯🇵', // Japanese (Japan flag)
+            'de': '🇩🇪', // German (Germany flag)
+            'fr': '🇫🇷', // French (France flag)
+            'ko': '🇰🇷'  // Korean (South Korea flag)
+        };
+
+        async function loadTranslations(lang) {
+            try {
+                const response = await fetch(`./locales/${lang}.json`);
+                if (!response.ok) {
+                    if (lang.includes('-')) {
+                        const baseLang = lang.split('-')[0];
+                        const baseResponse = await fetch(`./locales/${baseLang}.json`);
+                        if (baseResponse.ok) {
+                            translations = await baseResponse.json();
+                            console.log(`Loaded base translations for ${baseLang}`);
+                            applyTranslations();
+                            document.documentElement.lang = baseLang;
+                            return;
+                        }
+                    }
+                    throw new Error(`Could not load translations for ${lang}. Status: ${response.status}`);
+                }
+                translations = await response.json();
+                applyTranslations();
+                document.documentElement.lang = lang; 
+                console.log(`Translations loaded for ${lang}`);
+            } catch (error) {
+                console.error('Error loading translations:', error);
+                if (lang !== 'en') {
+                    console.log('Falling back to English translations.');
+                    loadTranslations('en');
+                } else {
+                    console.error('Failed to load even default English translations.');
+                }
+            }
+        }
+
+        function getTranslation(key, defaultValue = '') {
+            return translations[key] || defaultValue;
+        }
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.dataset.i18n;
+                element.textContent = getTranslation(key);
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.dataset.i18nPlaceholder;
+                element.placeholder = getTranslation(key);
+            });
+            document.querySelectorAll('[data-i18n-title]').forEach(element => {
+                const key = element.dataset.i18nTitle;
+                element.title = getTranslation(key);
+            });
+            
+            updateButtonStates();
+            
+            if (voiceSelect.options.length > 0 && voiceSelect.options[0].value === "") {
+                voiceSelect.options[0].textContent = getTranslation('loadingVoices');
+            }
+            if (voiceSelect.options.length === 1 && voiceSelect.options[0].value === "" && voiceSelect.options[0].textContent === getTranslation('noVoicesAvailable')) {
+                voiceSelect.options[0].textContent = getTranslation('noVoicesAvailable');
+            }
+
+            const outputPlaceholderParagraph = outputArea.querySelector('p.italic');
+            if (outputPlaceholderParagraph) {
+                outputPlaceholderParagraph.textContent = getTranslation('outputPlaceholder');
+            }
+        }
+
         function loadVoices() {
             voices = speechSynthesis.getVoices();
             voiceSelect.innerHTML = '';
 
-            // 添加日志确认语音加载
-            console.log('Available voices:', voices);
+            const userLang = navigator.language.split('-')[0];
 
-            // 过滤并排序语音
             const filteredVoices = voices.sort((a, b) => {
-                // 按语言和名称排序
                 return a.lang.localeCompare(b.lang) || a.name.localeCompare(b.name);
             });
 
-            // 添加语音选项
             if (filteredVoices.length > 0) {
-                let firstChineseVoiceIndex = -1;
+                let preferredVoiceIndex = -1;
                 filteredVoices.forEach((voice, index) => {
                     const option = document.createElement('option');
                     const voiceName = `${voice.name} (${voice.lang})`;
@@ -282,88 +365,68 @@
                     option.textContent = voiceName;
                     option.value = index;
 
-                    // 记录第一个包含 zh-CN 的语音的索引
-                    if (voiceName.includes('zh-CN') && firstChineseVoiceIndex === -1) {
-                        firstChineseVoiceIndex = index;
+                    if (voice.lang.startsWith(userLang) && preferredVoiceIndex === -1) {
+                        preferredVoiceIndex = index;
                     }
-
                     voiceSelect.appendChild(option);
                 });
 
-                // 如果有包含 zh-CN 的语音，选择第一个包含 zh-CN 的语音；否则选择第一个语音
-                if (firstChineseVoiceIndex !== -1) {
-                    voiceSelect.options[firstChineseVoiceIndex].selected = true;
+                if (preferredVoiceIndex !== -1) {
+                    voiceSelect.options[preferredVoiceIndex].selected = true;
                 } else {
                     voiceSelect.options[0].selected = true;
                 }
             } else {
-                voiceSelect.innerHTML = '<option value="">没有可用的语音</option>';
+                const option = document.createElement('option');
+                option.value = "";
+                option.textContent = getTranslation('noVoicesAvailable');
+                voiceSelect.appendChild(option);
             }
         }
 
-        // 初始化语音
         function initVoices() {
-            // 立即加载一次
             loadVoices();
-            
-            // 某些浏览器需要在voiceschanged事件后再次加载
             if (voices.length === 0) {
                 speechSynthesis.onvoiceschanged = loadVoices;
             }
         }
 
-        // 更新字符计数
         textInput.addEventListener('input', () => {
             charCount.textContent = textInput.value.length;
         });
 
-        // 粘贴事件处理
         textInput.addEventListener('paste', (e) => {
-            // 允许粘贴但不自动添加到朗读区域
-            showNotification('粘贴成功，请点击"添加到朗读"按钮将内容添加到朗读区域');
+            showNotification(getTranslation('pasteSuccessNotification'));
         });
 
-        // 添加到朗读区域
         addToReadingBtn.addEventListener('click', () => {
             const text = textInput.value.trim();
             if (!text) {
-                showNotification('输入框不能为空', 'error');
+                showNotification(getTranslation('emptyInputError'), 'error');
                 return;
             }
-            
-            // 添加到输出区域
             appendToOutput(text);
-            
-            // 显示通知
-            showNotification('文本已添加到朗读区域');
+            showNotification(getTranslation('textAddedNotification'));
         });
 
-        // 清空输入框
         clearInputBtn.addEventListener('click', () => {
             textInput.value = '';
             charCount.textContent = '0';
-            showNotification('输入框已清空');
+            showNotification(getTranslation('inputClearedNotification'));
         });
 
-        // 添加文本到输出区域
         function appendToOutput(text) {
-            // 如果是初始状态，先清空提示文本
             if (outputArea.querySelector('p.italic')) {
                 outputArea.innerHTML = '';
             }
 
-            // 去除文本前后的中英文空格
             text = text.replace(/^[\s\u3000]+|[\s\u3000]+$/g, '');
-
-            // 合并连续的空行
             text = text.replace(/\n{2,}/g, '\n');
 
-            // 改进的句子分割正则表达式，同时处理中英文
             const sentenceRegex = /(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<![A-Z]\.)(?<=[。！？\.?!；;])(?:\s|\n|$)/g;
             const newSentences = text.split(sentenceRegex);
 
             newSentences.forEach(sentence => {
-                // 去除句子前后的中英文空格
                 sentence = sentence.replace(/^[\s\u3000]+|[\s\u3000]+$/g, '');
 
                 if (sentence) {
@@ -372,48 +435,36 @@
                     paragraph.className = 'mb-3 last:mb-0 opacity-0 transform translate-y-2 transition-all duration-300';
                     outputArea.appendChild(paragraph);
 
-                    // 触发动画
                     setTimeout(() => {
                         paragraph.classList.remove('opacity-0', 'translate-y-2');
                     }, 10);
                 }
             });
 
-            // 滚动到底部
             outputArea.scrollTop = outputArea.scrollHeight;
-
-            // 更新句子数组
             updateSentences();
-
-            // 启用重置按钮
             resetBtn.disabled = false;
         }
 
-        // 更新句子数组
         function updateSentences() {
             sentences = Array.from(outputArea.querySelectorAll('p'));
         }
 
-        // 开始/暂停朗读
         playPauseBtn.addEventListener('click', () => {
-            // 如果没有内容，不执行任何操作
-            if (outputArea.textContent.trim() === '粘贴的内容将显示在这里...') {
-                showNotification('没有可朗读的内容', 'error');
+            if (outputArea.textContent.trim() === getTranslation('outputPlaceholder')) {
+                showNotification(getTranslation('noContentToReadError'), 'error');
                 return;
             }
             
             if (isPlaying) {
-                // 暂停朗读
                 speechSynthesis.pause();
                 isPlaying = false;
                 updateButtonStates();
-                showNotification('朗读已暂停');
+                showNotification(getTranslation('readingPausedNotification'));
             } else {
-                // 如果是新的朗读会话或者已经停止
                 if (!speechUtterance || speechSynthesis.speaking === false) {
                     startNewReading();
                 } else {
-                    // 恢复朗读
                     speechSynthesis.resume();
                     isPlaying = true;
                     updateButtonStates();
@@ -421,66 +472,53 @@
             }
         });
 
-        // 开始新的朗读
         function startNewReading() {
-            // 重置高亮
             resetHighlight();
 
-            // 创建新的语音实例
             const text = outputArea.textContent;
             speechUtterance = new SpeechSynthesisUtterance(text);
 
-            // 设置选中的语音
             const selectedVoiceIndex = voiceSelect.value;
             if (selectedVoiceIndex !== '' && voices.length > 0) {
                 speechUtterance.voice = voices[selectedVoiceIndex];
             }
 
-            // 设置语速
             speechUtterance.rate = parseFloat(rateInput.value);
 
-            // 设置句子边界
             speechUtterance.onboundary = (event) => {
                 if (event.name === 'sentence') {
                     highlightCurrentSentence(event.charIndex, event.charLength);
                 }
             };
 
-            // 设置语音完成回调
             speechUtterance.onend = () => {
                 isPlaying = false;
                 updateButtonStates();
                 resetHighlight();
-                showNotification('朗读已完成');
+                showNotification(getTranslation('readingCompleteNotification'));
             };
 
-            // 设置语音错误回调
             speechUtterance.onerror = (e) => {
-                console.error('语音朗读错误:', e);
+                console.error('Speech synthesis error:', e);
                 isPlaying = false;
                 updateButtonStates();
                 resetHighlight();
-                showNotification('语音朗读出错，请稍后再试', 'error');
+                showNotification(getTranslation('speechErrorNotification'), 'error');
             };
 
-            // 开始朗读
             speechSynthesis.speak(speechUtterance);
             isPlaying = true;
             currentSentenceIndex = 0;
             updateButtonStates();
 
-            // 初始高亮
             if (sentences.length > 0) {
                 sentences[0].classList.add('highlight');
             }
         }
 
-        // 高亮当前句子
         function highlightCurrentSentence(charIndex, charLength) {
-            // 移除之前的高亮
             resetHighlight();
             
-            // 计算当前句子索引
             let currentCharCount = 0;
             for (let i = 0; i < sentences.length; i++) {
                 currentCharCount += sentences[i].textContent.length;
@@ -488,120 +526,99 @@
                     currentSentenceIndex = i;
                     sentences[i].classList.add('highlight');
                     
-                    // 滚动到高亮句子
                     sentences[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
                     break;
                 }
             }
         }
 
-        // 重置高亮
         function resetHighlight() {
             sentences.forEach(sentence => {
                 sentence.classList.remove('highlight');
             });
         }
 
-        // 停止朗读
         stopBtn.addEventListener('click', () => {
             if (speechUtterance) {
                 speechSynthesis.cancel();
                 isPlaying = false;
                 resetHighlight();
                 updateButtonStates();
-                showNotification('朗读已停止');
+                showNotification(getTranslation('readingStoppedNotification'));
             }
         });
 
-        // 重置内容
         resetBtn.addEventListener('click', () => {
-            // 如果正在播放，先停止
             if (isPlaying) {
                 speechSynthesis.cancel();
                 isPlaying = false;
             }
             
-            // 重置输出区域
-            outputArea.innerHTML = '<p class="text-gray-400 italic">粘贴的内容将显示在这里...</p>';
+            outputArea.innerHTML = `<p class="text-gray-400 italic">${getTranslation('outputPlaceholder')}</p>`;
             
-            // 重置句子数组
             sentences = [];
             currentSentenceIndex = 0;
             
-            // 禁用重置按钮
             resetBtn.disabled = true;
             
-            // 显示通知
-            showNotification('朗读内容已重置');
+            showNotification(getTranslation('contentResetNotification'));
         });
 
-        // 复制内容
         copyBtn.addEventListener('click', () => {
-            // 如果是初始状态，不执行复制
             if (outputArea.querySelector('p.italic')) {
-                showNotification('没有可复制的内容', 'error');
+                showNotification(getTranslation('noContentToCopyError'), 'error');
                 return;
             }
             
-            // 复制到剪贴板
             navigator.clipboard.writeText(outputArea.textContent)
                 .then(() => {
-                    showNotification('内容已复制到剪贴板');
+                    showNotification(getTranslation('contentCopiedNotification'));
                 })
                 .catch(err => {
-                    console.error('复制失败:', err);
-                    showNotification('复制失败，请稍后再试', 'error');
+                    console.error('Copy failed:', err);
+                    showNotification(getTranslation('copyFailedError'), 'error');
                 });
         });
 
-        // 清空内容
         clearBtn.addEventListener('click', resetBtn.click.bind(resetBtn));
 
-        // 语速调整
         rateInput.addEventListener('input', () => {
             rateValue.textContent = rateInput.value;
             
-            // 如果正在播放，更新语速
             if (speechUtterance) {
                 speechUtterance.rate = parseFloat(rateInput.value);
             }
         });
 
-        // 更新按钮状态
         function updateButtonStates() {
             if (isPlaying) {
                 playPauseBtn.disabled = false;
                 stopBtn.disabled = false;
-                playPauseBtn.innerHTML = '<i class="fa fa-pause mr-2"></i> 暂停朗读';
+                playPauseBtn.innerHTML = `<i class="fa fa-pause mr-2"></i> ${getTranslation('pauseReadingButton')}`;
                 playPauseBtn.classList.remove('bg-primary');
                 playPauseBtn.classList.add('bg-secondary');
             } else {
                 playPauseBtn.disabled = false;
                 stopBtn.disabled = true;
-                playPauseBtn.innerHTML = '<i class="fa fa-play mr-2"></i> 开始朗读';
+                playPauseBtn.innerHTML = `<i class="fa fa-play mr-2"></i> ${getTranslation('startReadingButton')}`;
                 playPauseBtn.classList.remove('bg-secondary');
                 playPauseBtn.classList.add('bg-primary');
             }
         }
 
-        // 显示通知
         function showNotification(message, type = 'success') {
-            // 创建通知元素
             const notification = document.createElement('div');
             notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full z-50 ${
                 type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
             }`;
             notification.textContent = message;
             
-            // 添加到页面
             document.body.appendChild(notification);
             
-            // 触发动画
             setTimeout(() => {
                 notification.classList.remove('translate-x-full');
             }, 10);
             
-            // 3秒后移除
             setTimeout(() => {
                 notification.classList.add('translate-x-full');
                 setTimeout(() => {
@@ -610,11 +627,11 @@
             }, 3000);
         }
 
-        // 帮助模态框
         helpBtn.addEventListener('click', () => {
             helpModal.classList.remove('hidden');
             helpModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
             helpModal.querySelector('div').classList.add('scale-100', 'opacity-100');
+            applyTranslations(); 
         });
 
         closeHelp.addEventListener('click', () => {
@@ -627,14 +644,12 @@
 
         gotIt.addEventListener('click', closeHelp.click.bind(closeHelp));
 
-        // 点击模态框外部关闭
         helpModal.addEventListener('click', (e) => {
             if (e.target === helpModal) {
                 closeHelp.click();
             }
         });
 
-        // 主题切换
         themeToggle.addEventListener('click', () => {
             document.body.classList.toggle('dark');
             const icon = themeToggle.querySelector('i');
@@ -649,7 +664,6 @@
             }
         });
 
-        // 导航栏滚动效果
         window.addEventListener('scroll', () => {
             if (window.scrollY > 10) {
                 navbar.classList.add('py-2', 'shadow');
@@ -660,10 +674,48 @@
             }
         });
 
-        // 初始化
-        initVoices();
-        updateButtonStates();
+        document.addEventListener('DOMContentLoaded', () => {
+            const userLang = navigator.language.split('-')[0];
+            
+            const languages = {
+                'en': 'English',
+                'zh': '简体中文',
+                'es': 'Español', // Spanish
+                'hi': 'हिन्दी',   // Hindi
+                'ar': 'العربية',  // Arabic
+                'pt': 'Português',// Portuguese
+                'bn': 'বাংলা',    // Bengali
+                'ru': 'Русский',  // Russian
+                'ja': '日本語',   // Japanese
+                'de': 'Deutsch',  // German
+                'fr': 'Français', // French
+                'ko': '한국어'    // Korean
+            };
+
+            languageSelect.innerHTML = ''; 
+
+            for (const langCode in languages) {
+                const option = document.createElement('option');
+                option.value = langCode;
+                option.textContent = `${flagEmojis[langCode] || ''} ${languages[langCode]}`;
+                languageSelect.appendChild(option);
+            }
+
+            if (languages[userLang]) {
+                languageSelect.value = userLang;
+            } else {
+                languageSelect.value = 'en'; 
+            }
+
+            loadTranslations(languageSelect.value);
+
+            languageSelect.addEventListener('change', (event) => {
+                loadTranslations(event.target.value);
+            });
+
+            initVoices();
+            updateButtonStates();
+        });
     </script>
 </body>
 </html>
-    
