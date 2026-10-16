@@ -52,5 +52,15 @@
     "noContentToCopyError": "لا يوجد محتوى للنسخ",
     "contentCopiedNotification": "تم نسخ المحتوى إلى الحافظة",
     "copyFailedError": "فشل النسخ، يرجى المحاولة مرة أخرى لاحقًا",
+    "themeToggleTitle": "تبديل الوضع الداكن",
+    "helpButtonTitle": "فتح مساعدة",
+    "closeHelpButtonTitle": "إغلاق المساعدة",
+    "githubRepositoryTitle": "مستودع GitHub",
+    "dropFilesHint": "يمكنك أيضًا إفلات ملفات .txt أو .md هنا",
+    "fileImportedNotification": "تم استيراد الملف إلى مربع الإدخال",
+    "unsupportedFileError": "الملفات المدعومة هي .txt و .md فقط",
+    "fileReadError": "تعذر قراءة الملف",
+    "undoClearButton": "تراجع",
+    "contentRestoredNotification": "تمت استعادة محتوى القراءة",
     "selectLanguage": "تحديد اللغة"
 }

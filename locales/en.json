@@ -52,5 +52,15 @@
     "noContentToCopyError": "No content to copy",
     "contentCopiedNotification": "Content copied to clipboard",
     "copyFailedError": "Copy failed, please try again later",
+    "themeToggleTitle": "Toggle dark mode",
+    "helpButtonTitle": "Open help",
+    "closeHelpButtonTitle": "Close help",
+    "githubRepositoryTitle": "GitHub repository",
+    "dropFilesHint": "You can also drag and drop .txt or .md files here",
+    "fileImportedNotification": "File imported into the input box",
+    "unsupportedFileError": "Only .txt and .md files are supported",
+    "fileReadError": "Failed to read the file",
+    "undoClearButton": "Undo",
+    "contentRestoredNotification": "Reading content restored",
     "selectLanguage": "Select Language"
 }

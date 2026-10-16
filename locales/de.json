@@ -52,5 +52,15 @@
     "noContentToCopyError": "Kein Inhalt zum Kopieren",
     "contentCopiedNotification": "Inhalt in die Zwischenablage kopiert",
     "copyFailedError": "Kopieren fehlgeschlagen, bitte versuchen Sie es später erneut",
+    "themeToggleTitle": "Dunkelmodus umschalten",
+    "helpButtonTitle": "Hilfe öffnen",
+    "closeHelpButtonTitle": "Hilfe schließen",
+    "githubRepositoryTitle": "GitHub-Repository",
+    "dropFilesHint": "Sie können hier auch .txt- oder .md-Dateien ablegen",
+    "fileImportedNotification": "Datei in das Eingabefeld importiert",
+    "unsupportedFileError": "Nur .txt- und .md-Dateien werden unterstützt",
+    "fileReadError": "Datei konnte nicht gelesen werden",
+    "undoClearButton": "Rückgängig",
+    "contentRestoredNotification": "Leseinhalt wiederhergestellt",
     "selectLanguage": "Sprache auswählen"
 }

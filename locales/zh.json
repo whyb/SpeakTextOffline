@@ -52,5 +52,15 @@
     "noContentToCopyError": "没有可复制的内容",
     "contentCopiedNotification": "内容已复制到剪贴板",
     "copyFailedError": "复制失败，请稍后再试",
+    "themeToggleTitle": "切换深色模式",
+    "helpButtonTitle": "打开帮助",
+    "closeHelpButtonTitle": "关闭帮助",
+    "githubRepositoryTitle": "GitHub 仓库",
+    "dropFilesHint": "也可以将 .txt 或 .md 文件拖放到这里",
+    "fileImportedNotification": "文件已导入输入框",
+    "unsupportedFileError": "仅支持 .txt 和 .md 文件",
+    "fileReadError": "文件读取失败",
+    "undoClearButton": "撤销",
+    "contentRestoredNotification": "朗读内容已恢复",
     "selectLanguage": "选择语言"
 }

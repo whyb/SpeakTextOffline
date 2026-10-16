@@ -52,5 +52,15 @@
     "noContentToCopyError": "コピーするコンテンツがありません",
     "contentCopiedNotification": "コンテンツがクリップボードにコピーされました",
     "copyFailedError": "コピーに失敗しました。後で再試行してください。",
+    "themeToggleTitle": "ダークモードを切り替え",
+    "helpButtonTitle": "ヘルプを開く",
+    "closeHelpButtonTitle": "ヘルプを閉じる",
+    "githubRepositoryTitle": "GitHub リポジトリ",
+    "dropFilesHint": "ここに .txt または .md ファイルをドラッグ＆ドロップできます",
+    "fileImportedNotification": "ファイルを入力欄に読み込みました",
+    "unsupportedFileError": ".txt と .md ファイルのみ対応しています",
+    "fileReadError": "ファイルを読み込めませんでした",
+    "undoClearButton": "元に戻す",
+    "contentRestoredNotification": "朗読内容を復元しました",
     "selectLanguage": "言語を選択"
 }

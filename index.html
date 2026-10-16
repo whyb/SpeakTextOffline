@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -61,6 +62,92 @@
                 text-overflow: '';
             }
         }
+
+        html.dark {
+            color-scheme: dark;
+        }
+
+        html.dark body {
+            background-color: #111827;
+            color: #f9fafb;
+        }
+
+        .dark .bg-white {
+            background-color: #1f2937;
+        }
+
+        .dark .bg-gray-50 {
+            background-color: #111827;
+        }
+
+        .dark #output-area {
+            background-color: #374151;
+            border-color: #4b5563;
+            color: #e5e7eb;
+        }
+
+        .dark .border-gray-200 {
+            border-color: #4b5563;
+        }
+
+        .dark .bg-gray-200 {
+            background-color: #4b5563;
+        }
+
+        .dark .text-neutral,
+        .dark h1,
+        .dark h2,
+        .dark h3,
+        .dark h4 {
+            color: #f9fafb;
+        }
+
+        .dark .text-gray-700,
+        .dark .text-gray-600 {
+            color: #d1d5db;
+        }
+
+        .dark .text-gray-400,
+        .dark .text-gray-500 {
+            color: #9ca3af;
+        }
+
+        .notification {
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        html[dir="rtl"] .notification {
+            transform: translateX(-100%);
+        }
+
+        .notification.notification-visible {
+            transform: translateX(0);
+        }
+
+        .dark .hover\:bg-gray-100:hover {
+            background-color: #374151;
+        }
+
+        .dark .hover\:bg-gray-300:hover {
+            background-color: #6b7280;
+        }
+
+        .dark .highlight {
+            background-color: rgba(59, 130, 246, 0.28);
+            color: #bfdbfe;
+        }
+
+        html[dir="rtl"] #language-select {
+            padding-right: 0.75rem;
+            padding-left: 2.5rem;
+            background-position: left 0.75rem center;
+        }
+
+        .file-drop-target {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-neutral min-h-screen flex flex-col">
@@ -74,15 +161,15 @@
                 <button id="nav-play-pause-btn" class="px-3 py-2 bg-primary text-white rounded-lg shadow hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all flex items-center text-sm">
                     <i class="fa fa-play mr-2"></i> <span data-i18n="startReadingButton"></span>
                 </button>
-                <button id="nav-stop-btn" class="px-3 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 focus:ring-2 focus:ring-red-400/50 focus:outline-none transition-all flex items-center text-sm" disabled>
+                <button id="nav-stop-btn" class="px-3 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 focus:ring-2 focus:ring-red-400/50 focus:outline-none transition-all flex items-center text-sm disabled:opacity-50 disabled:cursor-not-allowed" data-i18n-title="stopReadingButton" disabled>
                     <i class="fa fa-stop mr-2"></i> <span data-i18n="stopReadingButton"></span>
                 </button>
-                <select id="language-select" class="px-3 py-2 rounded-lg border border-gray-200 text-gray-700 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none appearance-none bg-white" data-i18n-title="selectLanguage">
+                <select id="language-select" class="px-3 py-2 rounded-lg border border-gray-200 text-gray-700 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none appearance-none bg-white" data-i18n-title="selectLanguage" data-i18n-aria-label="selectLanguage">
                     </select>
-                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 transition-colors" data-i18n-aria-label="themeToggleTitle" aria-pressed="false">
                     <i class="fa fa-moon-o text-neutral"></i>
                 </button>
-                <button id="help-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                <button id="help-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors" data-i18n-aria-label="helpButtonTitle" aria-haspopup="dialog" aria-controls="help-modal">
                     <i class="fa fa-question-circle text-neutral"></i>
                 </button>
             </div>
@@ -98,7 +185,7 @@
             <p class="text-gray-600 leading-relaxed" data-i18n="aboutToolDescription"></p>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8" id="input-card">
             <h2 class="text-xl font-bold mb-4 text-neutral flex items-center">
                 <i class="fa fa-pencil-square-o text-primary mr-2"></i>
                 <span data-i18n="inputAreaTitle"></span>
@@ -107,7 +194,9 @@
                 <textarea 
                     id="text-input" 
                     class="w-full h-40 p-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all resize-none"
-                    data-i18n-placeholder="inputPlaceholder"></textarea>
+                    data-i18n-placeholder="inputPlaceholder"
+                    data-i18n-aria-label="inputAreaTitle"
+                    aria-describedby="drop-hint"></textarea>
                 <div class="absolute bottom-4 right-4 text-sm text-gray-400">
                     <span id="char-count">0</span> <span data-i18n="characters"></span>
                 </div>
@@ -120,6 +209,10 @@
                     <i class="fa fa-eraser mr-2"></i> <span data-i18n="clearInputButton"></span>
                 </button>
             </div>
+            <p id="drop-hint" class="mt-3 text-sm text-gray-500 flex items-center">
+                <i class="fa fa-file-text-o mr-2" aria-hidden="true"></i>
+                <span data-i18n="dropFilesHint"></span>
+            </p>
         </div>
 
         <div class="bg-white rounded-xl shadow-md p-6 mb-8">
@@ -131,7 +224,7 @@
                 <button id="play-pause-btn" class="px-6 py-3 bg-primary text-white rounded-lg shadow hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all flex items-center">
                     <i class="fa fa-play mr-2"></i> <span data-i18n="startReadingButton"></span>
                 </button>
-                <button id="stop-btn" class="px-6 py-3 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 focus:ring-2 focus:ring-red-400/50 focus:outline-none transition-all flex items-center" disabled>
+                <button id="stop-btn" class="px-6 py-3 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 focus:ring-2 focus:ring-red-400/50 focus:outline-none transition-all flex items-center disabled:opacity-50 disabled:cursor-not-allowed" data-i18n-title="stopReadingButton" disabled>
                     <i class="fa fa-stop mr-2"></i> <span data-i18n="stopReadingButton"></span>
                 </button>
                 <button id="reset-btn" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 focus:ring-2 focus:ring-gray-400/50 focus:outline-none transition-all flex items-center" disabled>
@@ -154,7 +247,7 @@
                 <div>
                     <label for="rate" class="block text-gray-700 font-medium mb-2" data-i18n="speechRateLabel"></label>
                     <div class="flex items-center space-x-2">
-                        <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1" 
+                        <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1" aria-valuetext="1.0"
                             class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary">
                         <span id="rate-value" class="text-sm text-gray-600 min-w-[30px]">1.0</span>
                     </div>
@@ -164,20 +257,20 @@
 
         <div class="bg-white rounded-xl shadow-md p-6 mb-8">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-neutral flex items-center">
+                <h2 id="reading-content-title" class="text-xl font-bold text-neutral flex items-center">
                     <i class="fa fa-file-text-o text-primary mr-2"></i>
                     <span data-i18n="readingContentTitle"></span>
                 </h2>
                 <div class="flex space-x-2">
-                    <button id="copy-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600" data-i18n-title="copyContentTitle">
-                        <i class="fa fa-copy"></i>
+                    <button id="copy-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600" data-i18n-title="copyContentTitle" data-i18n-aria-label="copyContentTitle">
+                        <i class="fa fa-copy" aria-hidden="true"></i>
                     </button>
-                    <button id="clear-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600" data-i18n-title="clearContentTitle">
-                        <i class="fa fa-trash"></i>
+                    <button id="clear-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600" data-i18n-title="clearContentTitle" data-i18n-aria-label="clearContentTitle">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
-            <div id="output-area" class="min-h-32 p-4 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 whitespace-pre-wrap break-words transition-all">
+            <div id="output-area" role="region" aria-labelledby="reading-content-title" class="min-h-32 p-4 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 whitespace-pre-wrap break-words transition-all">
                 <p class="text-gray-400 italic" data-i18n="outputPlaceholder"></p>
             </div>
         </div>
@@ -194,8 +287,8 @@
                     <p class="text-gray-400 text-sm mt-1" data-i18n="footerTagline"></p>
                 </div>
                 <div class="flex space-x-4">
-                    <a href="https://github.com/whyb/SpeakTextOffline" target="_blank" class="text-gray-400 hover:text-white transition-colors">
-                        <i class="fa fa-github text-xl"></i>
+                    <a href="https://github.com/whyb/SpeakTextOffline" target="_blank" class="text-gray-400 hover:text-white transition-colors" data-i18n-aria-label="githubRepositoryTitle">
+                        <i class="fa fa-github text-xl" aria-hidden="true"></i>
                     </a>
                 </div>
             </div>
@@ -205,12 +298,12 @@
         </div>
     </footer>
 
-    <div id="help-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div id="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title" aria-hidden="true" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-xl shadow-lg p-6 max-w-md w-full mx-4 transform transition-all">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-neutral" data-i18n="helpModalTitle"></h3>
-                <button id="close-help" class="text-gray-400 hover:text-gray-600">
-                    <i class="fa fa-times text-xl"></i>
+                <h3 id="help-modal-title" class="text-xl font-bold text-neutral" data-i18n="helpModalTitle"></h3>
+                <button id="close-help" class="text-gray-400 hover:text-gray-600" data-i18n-aria-label="closeHelpButtonTitle">
+                    <i class="fa fa-times text-xl" aria-hidden="true"></i>
                 </button>
             </div>
             <div class="space-y-4 text-gray-600">
@@ -223,7 +316,7 @@
                     <p data-i18n="howToUseStep5"></p>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-neutral">Control Options</h4>
+                    <h4 class="font-semibold text-neutral" data-i18n="controlOptionsTitle"></h4>
                     <p data-i18n="controlOptionPlayPause"></p>
                     <p data-i18n="controlOptionStop"></p>
                     <p data-i18n="controlOptionReset"></p>
@@ -264,6 +357,7 @@
         const addToReadingBtn = document.getElementById('add-to-reading');
         const clearInputBtn = document.getElementById('clear-input');
         const languageSelect = document.getElementById('language-select');
+        const inputCard = document.getElementById('input-card');
 
         let speechSynthesis = window.speechSynthesis;
         let speechUtterance = null;
@@ -272,6 +366,13 @@
         let currentSentenceIndex = 0;
         let sentences = [];
         let translations = {};
+        let helpModalPreviousFocus = null;
+        let isHelpModalOpen = false;
+        let fileDragDepth = 0;
+        let isAppendingOutput = false;
+        let outputImportGeneration = 0;
+        const pendingOutputSentences = [];
+        const outputBatchSize = 100;
 
         // Mapping of language codes to flag emojis
         const flagEmojis = {
@@ -289,6 +390,12 @@
             'ko': '🇰🇷'  // Korean (South Korea flag)
         };
 
+        function applyDocumentDirection(lang) {
+            const baseLang = lang.split('-')[0];
+            const rtlLanguages = ['ar', 'he', 'fa', 'ur'];
+            document.documentElement.dir = rtlLanguages.includes(baseLang) ? 'rtl' : 'ltr';
+        }
+
         async function loadTranslations(lang) {
             try {
                 const response = await fetch(`./locales/${lang}.json`);
@@ -301,6 +408,7 @@
                             console.log(`Loaded base translations for ${baseLang}`);
                             applyTranslations();
                             document.documentElement.lang = baseLang;
+                            applyDocumentDirection(baseLang);
                             return;
                         }
                     }
@@ -308,7 +416,8 @@
                 }
                 translations = await response.json();
                 applyTranslations();
-                document.documentElement.lang = lang; 
+                document.documentElement.lang = lang;
+                applyDocumentDirection(lang);
                 console.log(`Translations loaded for ${lang}`);
             } catch (error) {
                 console.error('Error loading translations:', error);
@@ -338,7 +447,11 @@
                 const key = element.dataset.i18nTitle;
                 element.title = getTranslation(key);
             });
-            
+            document.querySelectorAll('[data-i18n-aria-label]').forEach(element => {
+                const key = element.dataset.i18nAriaLabel;
+                element.setAttribute('aria-label', getTranslation(key));
+            });
+
             updateButtonStates();
             
             if (voiceSelect.options.length > 0 && voiceSelect.options[0].value === "") {
@@ -423,6 +536,81 @@
             showNotification(getTranslation('inputClearedNotification'));
         });
 
+        inputCard.addEventListener('dragenter', (event) => {
+            if (!Array.from(event.dataTransfer?.types || []).includes('Files')) {
+                return;
+            }
+            event.preventDefault();
+            fileDragDepth += 1;
+            inputCard.classList.add('file-drop-target');
+        });
+
+        inputCard.addEventListener('dragover', (event) => {
+            if (!Array.from(event.dataTransfer?.types || []).includes('Files')) {
+                return;
+            }
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+        });
+
+        inputCard.addEventListener('dragleave', () => {
+            fileDragDepth = Math.max(0, fileDragDepth - 1);
+            if (fileDragDepth === 0) {
+                inputCard.classList.remove('file-drop-target');
+            }
+        });
+
+        inputCard.addEventListener('drop', async (event) => {
+            event.preventDefault();
+            fileDragDepth = 0;
+            inputCard.classList.remove('file-drop-target');
+
+            const files = Array.from(event.dataTransfer?.files || []);
+            const textFiles = files.filter(file => /\.(txt|md)$/i.test(file.name));
+
+            if (textFiles.length === 0) {
+                showNotification(getTranslation('unsupportedFileError'), 'error');
+                return;
+            }
+
+            try {
+                const importedParts = [];
+                for (const file of textFiles) {
+                    importedParts.push(await file.text());
+                }
+
+                const importedText = importedParts.join('\n\n').trim();
+                if (!importedText) {
+                    showNotification(getTranslation('emptyInputError'), 'error');
+                    return;
+                }
+
+                textInput.value = textInput.value.trim()
+                    ? `${textInput.value.trim()}\n\n${importedText}`
+                    : importedText;
+                charCount.textContent = textInput.value.length;
+                textInput.focus();
+                showNotification(getTranslation('fileImportedNotification'));
+            } catch (error) {
+                console.error('File import failed:', error);
+                showNotification(getTranslation('fileReadError'), 'error');
+            }
+        });
+
+        function splitIntoSentences(text) {
+            if (typeof Intl !== 'undefined' && typeof Intl.Segmenter === 'function') {
+                try {
+                    const segmenter = new Intl.Segmenter(undefined, { granularity: 'sentence' });
+                    return Array.from(segmenter.segment(text), item => item.segment);
+                } catch (error) {
+                    console.warn('Sentence segmenter failed, using fallback:', error);
+                }
+            }
+
+            const sentenceRegex = /(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<![A-Z]\.)(?<=[。！？\.?!；;])(?:\s|\n|$)/g;
+            return text.split(sentenceRegex);
+        }
+
         function appendToOutput(text) {
             if (outputArea.querySelector('p.italic')) {
                 outputArea.innerHTML = '';
@@ -431,27 +619,63 @@
             text = text.replace(/^[\s\u3000]+|[\s\u3000]+$/g, '');
             text = text.replace(/\n{2,}/g, '\n');
 
-            const sentenceRegex = /(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<![A-Z]\.)(?<=[。！？\.?!；;])(?:\s|\n|$)/g;
-            const newSentences = text.split(sentenceRegex);
+            const newSentences = splitIntoSentences(text)
+                .map(sentence => sentence.replace(/^[\s\u3000]+|[\s\u3000]+$/g, ''))
+                .filter(Boolean);
 
-            newSentences.forEach(sentence => {
-                sentence = sentence.replace(/^[\s\u3000]+|[\s\u3000]+$/g, '');
+            if (newSentences.length === 0) {
+                return;
+            }
 
-                if (sentence) {
+            newSentences.forEach(sentence => pendingOutputSentences.push(sentence));
+            processPendingOutputSentences();
+        }
+
+        function processPendingOutputSentences() {
+            if (isAppendingOutput || pendingOutputSentences.length === 0) {
+                return;
+            }
+
+            isAppendingOutput = true;
+            const generation = outputImportGeneration;
+
+            function appendBatch() {
+                if (generation !== outputImportGeneration) {
+                    return;
+                }
+
+                const batch = pendingOutputSentences.splice(0, outputBatchSize);
+                const fragment = document.createDocumentFragment();
+                const batchParagraphs = [];
+
+                batch.forEach(sentence => {
                     const paragraph = document.createElement('p');
                     paragraph.textContent = sentence;
                     paragraph.className = 'mb-3 last:mb-0 opacity-0 transform translate-y-2 transition-all duration-300';
-                    outputArea.appendChild(paragraph);
+                    fragment.appendChild(paragraph);
+                    batchParagraphs.push(paragraph);
+                });
 
-                    setTimeout(() => {
+                outputArea.appendChild(fragment);
+                requestAnimationFrame(() => {
+                    batchParagraphs.forEach(paragraph => {
                         paragraph.classList.remove('opacity-0', 'translate-y-2');
-                    }, 10);
-                }
-            });
+                    });
+                });
 
-            outputArea.scrollTop = outputArea.scrollHeight;
-            updateSentences();
-            resetBtn.disabled = false;
+                outputArea.scrollTop = outputArea.scrollHeight;
+                updateSentences();
+                resetBtn.disabled = false;
+
+                if (pendingOutputSentences.length > 0) {
+                    setTimeout(appendBatch, 0);
+                } else {
+                    isAppendingOutput = false;
+                    outputArea.scrollTop = outputArea.scrollHeight;
+                }
+            }
+
+            appendBatch();
         }
 
         function updateSentences() {
@@ -565,19 +789,46 @@
         });
 
         resetBtn.addEventListener('click', () => {
+            const hadContent = !outputArea.querySelector('p.italic') && outputArea.textContent.trim() !== '';
+            const previousContent = outputArea.innerHTML;
+            const previousFocus = document.activeElement;
+
             if (isPlaying) {
                 speechSynthesis.cancel();
                 isPlaying = false;
             }
-            
+
+            outputImportGeneration += 1;
+            pendingOutputSentences.length = 0;
+            isAppendingOutput = false;
+
             outputArea.innerHTML = `<p class="text-gray-400 italic">${getTranslation('outputPlaceholder')}</p>`;
-            
+
             sentences = [];
             currentSentenceIndex = 0;
-            
+
             resetBtn.disabled = true;
-            
-            showNotification(getTranslation('contentResetNotification'));
+
+            const undoAction = hadContent ? {
+                label: getTranslation('undoClearButton', 'Undo'),
+                onAction: () => {
+                    outputArea.innerHTML = previousContent;
+                    updateSentences();
+                    resetHighlight();
+                    resetBtn.disabled = false;
+                    if (previousFocus && previousFocus.isConnected) {
+                        previousFocus.focus();
+                    }
+                    showNotification(getTranslation('contentRestoredNotification'));
+                }
+            } : null;
+
+            showNotification(
+                getTranslation('contentResetNotification'),
+                'success',
+                undoAction,
+                hadContent ? 8000 : 3000
+            );
         });
 
         copyBtn.addEventListener('click', () => {
@@ -600,7 +851,8 @@
 
         rateInput.addEventListener('input', () => {
             rateValue.textContent = rateInput.value;
-            
+            rateInput.setAttribute('aria-valuetext', rateInput.value);
+
             if (speechUtterance) {
                 speechUtterance.rate = parseFloat(rateInput.value);
             }
@@ -628,62 +880,134 @@
             navPlayPauseBtn.classList.add(isPlaying ? 'bg-secondary' : 'bg-primary');
         }
 
-        function showNotification(message, type = 'success') {
+        function showNotification(message, type = 'success', action = null, duration = 3000) {
             const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full z-50 ${
+            const horizontalPosition = document.documentElement.dir === 'rtl' ? 'left-4' : 'right-4';
+            notification.className = `notification fixed top-4 ${horizontalPosition} max-w-[calc(100vw-2rem)] px-6 py-3 rounded-lg shadow-lg z-50 flex items-center ${
                 type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
             }`;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.remove('translate-x-full');
-            }, 10);
-            
-            setTimeout(() => {
-                notification.classList.add('translate-x-full');
-                setTimeout(() => {
+            notification.setAttribute('role', type === 'error' ? 'alert' : 'status');
+            notification.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
+            notification.appendChild(document.createTextNode(message));
+
+            const removeNotification = () => {
+                if (notification.isConnected) {
                     document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
+                }
+            };
+
+            if (action) {
+                const actionButton = document.createElement('button');
+                actionButton.type = 'button';
+                actionButton.className = 'mx-4 font-semibold underline focus:outline-none focus:ring-2 focus:ring-white/70 rounded';
+                actionButton.textContent = action.label;
+                actionButton.addEventListener('click', () => {
+                    action.onAction();
+                    removeNotification();
+                });
+                notification.appendChild(actionButton);
+            }
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('notification-visible');
+            }, 10);
+
+            setTimeout(() => {
+                notification.classList.remove('notification-visible');
+                setTimeout(removeNotification, 300);
+            }, duration);
         }
 
-        helpBtn.addEventListener('click', () => {
+        function openHelpModal() {
+            if (isHelpModalOpen) {
+                return;
+            }
+
+            isHelpModalOpen = true;
+            helpModalPreviousFocus = document.activeElement;
             helpModal.classList.remove('hidden');
+            helpModal.setAttribute('aria-hidden', 'false');
             helpModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
             helpModal.querySelector('div').classList.add('scale-100', 'opacity-100');
-            applyTranslations(); 
-        });
+            applyTranslations();
 
-        closeHelp.addEventListener('click', () => {
+            requestAnimationFrame(() => closeHelp.focus());
+        }
+
+        function closeHelpModal() {
+            if (!isHelpModalOpen) {
+                return;
+            }
+
+            isHelpModalOpen = false;
             helpModal.querySelector('div').classList.remove('scale-100', 'opacity-100');
             helpModal.querySelector('div').classList.add('scale-95', 'opacity-0');
+
             setTimeout(() => {
                 helpModal.classList.add('hidden');
+                helpModal.setAttribute('aria-hidden', 'true');
+                if (helpModalPreviousFocus && helpModalPreviousFocus.isConnected) {
+                    helpModalPreviousFocus.focus();
+                }
             }, 300);
+        }
+
+        helpBtn.addEventListener('click', openHelpModal);
+        closeHelp.addEventListener('click', closeHelpModal);
+        gotIt.addEventListener('click', closeHelpModal);
+
+        helpModal.addEventListener('click', (event) => {
+            if (event.target === helpModal) {
+                closeHelpModal();
+            }
         });
 
-        gotIt.addEventListener('click', closeHelp.click.bind(closeHelp));
+        document.addEventListener('keydown', (event) => {
+            if (!isHelpModalOpen) {
+                return;
+            }
 
-        helpModal.addEventListener('click', (e) => {
-            if (e.target === helpModal) {
-                closeHelp.click();
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                closeHelpModal();
+                return;
+            }
+
+            if (event.key !== 'Tab') {
+                return;
+            }
+
+            const focusableElements = Array.from(helpModal.querySelectorAll(
+                'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            )).filter(element => element.offsetParent !== null);
+
+            if (focusableElements.length === 0) {
+                event.preventDefault();
+                return;
+            }
+
+            const firstElement = focusableElements[0];
+            const lastElement = focusableElements[focusableElements.length - 1];
+
+            if (event.shiftKey && document.activeElement === firstElement) {
+                event.preventDefault();
+                lastElement.focus();
+            } else if (!event.shiftKey && document.activeElement === lastElement) {
+                event.preventDefault();
+                firstElement.focus();
             }
         });
 
         themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark');
+            const isDark = document.documentElement.classList.toggle('dark');
+            document.body.classList.toggle('dark', isDark);
+            themeToggle.setAttribute('aria-pressed', String(isDark));
+
             const icon = themeToggle.querySelector('i');
-            if (icon.classList.contains('fa-moon-o')) {
-                icon.classList.remove('fa-moon-o');
-                icon.classList.add('fa-sun-o');
-                document.documentElement.classList.add('dark');
-            } else {
-                icon.classList.remove('fa-sun-o');
-                icon.classList.add('fa-moon-o');
-                document.documentElement.classList.remove('dark');
-            }
+            icon.classList.toggle('fa-moon-o', !isDark);
+            icon.classList.toggle('fa-sun-o', isDark);
         });
 
         window.addEventListener('scroll', () => {

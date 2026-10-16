@@ -52,5 +52,15 @@
     "noContentToCopyError": "복사할 콘텐츠가 없습니다",
     "contentCopiedNotification": "콘텐츠가 클립보드에 복사되었습니다",
     "copyFailedError": "복사 실패, 나중에 다시 시도하십시오",
+    "themeToggleTitle": "다크 모드 전환",
+    "helpButtonTitle": "도움말 열기",
+    "closeHelpButtonTitle": "도움말 닫기",
+    "githubRepositoryTitle": "GitHub 저장소",
+    "dropFilesHint": "여기에 .txt 또는 .md 파일을 끌어다 놓을 수도 있습니다",
+    "fileImportedNotification": "파일을 입력 상자로 가져왔습니다",
+    "unsupportedFileError": ".txt 및 .md 파일만 지원합니다",
+    "fileReadError": "파일을 읽지 못했습니다",
+    "undoClearButton": "실행 취소",
+    "contentRestoredNotification": "읽기 내용이 복원되었습니다",
     "selectLanguage": "언어 선택"
 }

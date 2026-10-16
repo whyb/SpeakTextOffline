@@ -52,5 +52,15 @@
     "noContentToCopyError": "Nenhum conteúdo para copiar",
     "contentCopiedNotification": "Conteúdo copiado para a área de transferência",
     "copyFailedError": "Falha na cópia, por favor, tente novamente mais tarde",
+    "themeToggleTitle": "Alternar modo escuro",
+    "helpButtonTitle": "Abrir ajuda",
+    "closeHelpButtonTitle": "Fechar ajuda",
+    "githubRepositoryTitle": "Repositório GitHub",
+    "dropFilesHint": "Você também pode arrastar e soltar arquivos .txt ou .md aqui",
+    "fileImportedNotification": "Arquivo importado para a caixa de entrada",
+    "unsupportedFileError": "Apenas arquivos .txt e .md são suportados",
+    "fileReadError": "Falha ao ler o arquivo",
+    "undoClearButton": "Desfazer",
+    "contentRestoredNotification": "Conteúdo de leitura restaurado",
     "selectLanguage": "Selecionar Idioma"
 }

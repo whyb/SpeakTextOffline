@@ -52,5 +52,15 @@
     "noContentToCopyError": "Нет содержимого для копирования",
     "contentCopiedNotification": "Содержимое скопировано в буфер обмена",
     "copyFailedError": "Ошибка копирования, пожалуйста, попробуйте еще раз позже",
+    "themeToggleTitle": "Переключить тёмную тему",
+    "helpButtonTitle": "Открыть справку",
+    "closeHelpButtonTitle": "Закрыть справку",
+    "githubRepositoryTitle": "Репозиторий GitHub",
+    "dropFilesHint": "Сюда также можно перетащить файлы .txt или .md",
+    "fileImportedNotification": "Файл импортирован в поле ввода",
+    "unsupportedFileError": "Поддерживаются только файлы .txt и .md",
+    "fileReadError": "Не удалось прочитать файл",
+    "undoClearButton": "Отменить",
+    "contentRestoredNotification": "Содержимое чтения восстановлено",
     "selectLanguage": "Выбрать язык"
 }
