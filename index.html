@@ -71,6 +71,12 @@
                 <h1 class="text-xl md:text-2xl font-bold text-neutral" data-i18n="appTitle"></h1>
             </div>
             <div class="flex items-center space-x-4">
+                <button id="nav-play-pause-btn" class="px-3 py-2 bg-primary text-white rounded-lg shadow hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all flex items-center text-sm">
+                    <i class="fa fa-play mr-2"></i> <span data-i18n="startReadingButton"></span>
+                </button>
+                <button id="nav-stop-btn" class="px-3 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 focus:ring-2 focus:ring-red-400/50 focus:outline-none transition-all flex items-center text-sm" disabled>
+                    <i class="fa fa-stop mr-2"></i> <span data-i18n="stopReadingButton"></span>
+                </button>
                 <select id="language-select" class="px-3 py-2 rounded-lg border border-gray-200 text-gray-700 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none appearance-none bg-white" data-i18n-title="selectLanguage">
                     </select>
                 <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
@@ -241,6 +247,8 @@
         const charCount = document.getElementById('char-count');
         const playPauseBtn = document.getElementById('play-pause-btn');
         const stopBtn = document.getElementById('stop-btn');
+        const navPlayPauseBtn = document.getElementById('nav-play-pause-btn');
+        const navStopBtn = document.getElementById('nav-stop-btn');
         const resetBtn = document.getElementById('reset-btn');
         const rateInput = document.getElementById('rate');
         const rateValue = document.getElementById('rate-value');
@@ -472,6 +480,10 @@
             }
         });
 
+        navPlayPauseBtn.addEventListener('click', () => {
+            playPauseBtn.click();
+        });
+
         function startNewReading() {
             resetHighlight();
 
@@ -548,6 +560,10 @@
             }
         });
 
+        navStopBtn.addEventListener('click', () => {
+            stopBtn.click();
+        });
+
         resetBtn.addEventListener('click', () => {
             if (isPlaying) {
                 speechSynthesis.cancel();
@@ -604,6 +620,12 @@
                 playPauseBtn.classList.remove('bg-secondary');
                 playPauseBtn.classList.add('bg-primary');
             }
+
+            navPlayPauseBtn.disabled = playPauseBtn.disabled;
+            navStopBtn.disabled = stopBtn.disabled;
+            navPlayPauseBtn.innerHTML = playPauseBtn.innerHTML;
+            navPlayPauseBtn.classList.remove('bg-primary', 'bg-secondary');
+            navPlayPauseBtn.classList.add(isPlaying ? 'bg-secondary' : 'bg-primary');
         }
 
         function showNotification(message, type = 'success') {
