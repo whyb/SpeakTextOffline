@@ -220,7 +220,7 @@
                 <i class="fa fa-volume-up text-primary mr-2"></i>
                 <span data-i18n="readingControlsTitle"></span>
             </h2>
-            <div class="flex flex-wrap gap-4 mb-6">
+            <div class="flex flex-wrap gap-4 mb-4">
                 <button id="play-pause-btn" class="px-6 py-3 bg-primary text-white rounded-lg shadow hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all flex items-center">
                     <i class="fa fa-play mr-2"></i> <span data-i18n="startReadingButton"></span>
                 </button>
@@ -230,6 +230,18 @@
                 <button id="reset-btn" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 focus:ring-2 focus:ring-gray-400/50 focus:outline-none transition-all flex items-center" disabled>
                     <i class="fa fa-refresh mr-2"></i> <span data-i18n="resetContentButton"></span>
                 </button>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                <div class="flex items-center text-sm text-gray-600" role="status" aria-live="polite">
+                    <i class="fa fa-tachometer text-primary mr-2" aria-hidden="true"></i>
+                    <span data-i18n="readingProgressLabel"></span>
+                    <span id="reading-progress-value" class="ms-2 font-semibold text-neutral">0 / 0</span>
+                </div>
+                <label for="auto-scroll-toggle" class="flex items-center cursor-pointer text-sm text-gray-600">
+                    <input type="checkbox" id="auto-scroll-toggle" checked class="h-4 w-4 mr-2 accent-primary focus:ring-primary/50">
+                    <span data-i18n="autoScrollLabel"></span>
+                </label>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -358,12 +370,20 @@
         const clearInputBtn = document.getElementById('clear-input');
         const languageSelect = document.getElementById('language-select');
         const inputCard = document.getElementById('input-card');
+        const readingProgressValue = document.getElementById('reading-progress-value');
+        const autoScrollToggle = document.getElementById('auto-scroll-toggle');
+
+        const USER_STATE_STORAGE_KEY = 'speakTextOfflineUserState.v1';
+        const savedUserState = loadUserState();
 
         let speechSynthesis = window.speechSynthesis;
         let speechUtterance = null;
-        let isPlaying = false;
+        let playbackState = 'idle';
+        let speechSessionId = 0;
         let voices = [];
+        let preferredVoiceURI = savedUserState.voiceURI;
         let currentSentenceIndex = 0;
+        let hasPlaybackPosition = false;
         let sentences = [];
         let translations = {};
         let helpModalPreviousFocus = null;
@@ -371,6 +391,8 @@
         let fileDragDepth = 0;
         let isAppendingOutput = false;
         let outputImportGeneration = 0;
+        let stateSaveTimer = null;
+        let isStateInitialized = false;
         const pendingOutputSentences = [];
         const outputBatchSize = 100;
 
@@ -467,39 +489,202 @@
             }
         }
 
+        function loadUserState() {
+            const defaults = {
+                version: 1,
+                inputText: '',
+                outputSentences: [],
+                currentSentenceIndex: 0,
+                hasPlaybackPosition: false,
+                voiceURI: '',
+                rate: 1,
+                language: '',
+                darkMode: false,
+                autoScroll: true
+            };
+
+            try {
+                const storedValue = localStorage.getItem(USER_STATE_STORAGE_KEY);
+                if (!storedValue) {
+                    return defaults;
+                }
+
+                const parsed = JSON.parse(storedValue);
+                if (!parsed || parsed.version !== 1) {
+                    return defaults;
+                }
+
+                const parsedRate = Number(parsed.rate);
+                return {
+                    version: 1,
+                    inputText: typeof parsed.inputText === 'string' ? parsed.inputText : '',
+                    outputSentences: Array.isArray(parsed.outputSentences)
+                        ? parsed.outputSentences.filter(sentence => typeof sentence === 'string')
+                        : [],
+                    currentSentenceIndex: Number.isInteger(parsed.currentSentenceIndex)
+                        ? Math.max(0, parsed.currentSentenceIndex)
+                        : 0,
+                    hasPlaybackPosition: parsed.hasPlaybackPosition === true,
+                    voiceURI: typeof parsed.voiceURI === 'string' ? parsed.voiceURI : '',
+                    rate: Number.isFinite(parsedRate) ? Math.min(2, Math.max(0.5, parsedRate)) : 1,
+                    language: typeof parsed.language === 'string' ? parsed.language : '',
+                    darkMode: parsed.darkMode === true,
+                    autoScroll: parsed.autoScroll !== false
+                };
+            } catch (error) {
+                console.warn('Unable to restore saved user state:', error);
+                return defaults;
+            }
+        }
+
+        function applyTheme(isDark) {
+            document.documentElement.classList.toggle('dark', isDark);
+            document.body.classList.toggle('dark', isDark);
+            themeToggle.setAttribute('aria-pressed', String(isDark));
+
+            const icon = themeToggle.querySelector('i');
+            icon.classList.toggle('fa-moon-o', !isDark);
+            icon.classList.toggle('fa-sun-o', isDark);
+        }
+
+        function restoreUserInterfaceState() {
+            textInput.value = savedUserState.inputText;
+            charCount.textContent = String(textInput.value.length);
+
+            const restoredRate = String(savedUserState.rate.toFixed(1));
+            rateInput.value = restoredRate;
+            rateValue.textContent = restoredRate;
+            rateInput.setAttribute('aria-valuetext', restoredRate);
+
+            autoScrollToggle.checked = savedUserState.autoScroll;
+            applyTheme(savedUserState.darkMode);
+            isStateInitialized = true;
+        }
+
+        function restoreOutputState() {
+            const storedSentences = savedUserState.outputSentences
+                .map(sentence => sentence.trim())
+                .filter(Boolean);
+
+            if (storedSentences.length === 0) {
+                updateReadingProgress();
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            storedSentences.forEach(sentenceText => {
+                const paragraph = document.createElement('p');
+                paragraph.textContent = sentenceText;
+                paragraph.className = 'mb-3 last:mb-0';
+                fragment.appendChild(paragraph);
+            });
+
+            outputArea.innerHTML = '';
+            outputArea.appendChild(fragment);
+            resetBtn.disabled = false;
+
+            updateSentences();
+            currentSentenceIndex = Math.min(savedUserState.currentSentenceIndex, sentences.length);
+            hasPlaybackPosition = savedUserState.hasPlaybackPosition;
+
+            if (hasPlaybackPosition && sentences[currentSentenceIndex]) {
+                sentences[currentSentenceIndex].classList.add('highlight');
+            }
+
+            updateReadingProgress();
+        }
+
+        function getStoredOutputSentences() {
+            if (outputArea.querySelector('p.italic')) {
+                return [];
+            }
+
+            return Array.from(outputArea.querySelectorAll('p'))
+                .map(paragraph => paragraph.textContent)
+                .filter(Boolean);
+        }
+
+        function saveUserStateNow() {
+            if (!isStateInitialized) {
+                return;
+            }
+
+            if (stateSaveTimer) {
+                clearTimeout(stateSaveTimer);
+                stateSaveTimer = null;
+            }
+
+            const stateToSave = {
+                version: 1,
+                inputText: textInput.value,
+                outputSentences: getStoredOutputSentences(),
+                currentSentenceIndex,
+                hasPlaybackPosition,
+                voiceURI: preferredVoiceURI,
+                rate: parseFloat(rateInput.value) || 1,
+                language: languageSelect.value || savedUserState.language,
+                darkMode: document.documentElement.classList.contains('dark'),
+                autoScroll: autoScrollToggle.checked
+            };
+
+            try {
+                localStorage.setItem(USER_STATE_STORAGE_KEY, JSON.stringify(stateToSave));
+            } catch (error) {
+                console.warn('Unable to save user state:', error);
+            }
+        }
+
+        function scheduleUserStateSave() {
+            if (stateSaveTimer) {
+                clearTimeout(stateSaveTimer);
+            }
+
+            stateSaveTimer = setTimeout(() => {
+                stateSaveTimer = null;
+                saveUserStateNow();
+            }, 250);
+        }
+
+        function getVoiceKey(voice) {
+            return voice.voiceURI || `${voice.name}::${voice.lang}`;
+        }
+
         function loadVoices() {
             voices = speechSynthesis.getVoices();
             voiceSelect.innerHTML = '';
 
-            const userLang = navigator.language.split('-')[0];
-
-            const filteredVoices = voices.sort((a, b) => {
+            const preferredLanguage = languageSelect.value || navigator.language.split('-')[0];
+            const filteredVoices = voices.slice().sort((a, b) => {
                 return a.lang.localeCompare(b.lang) || a.name.localeCompare(b.name);
             });
 
             if (filteredVoices.length > 0) {
-                let preferredVoiceIndex = -1;
+                let preferredVoiceIndex = filteredVoices.findIndex(
+                    voice => getVoiceKey(voice) === preferredVoiceURI
+                );
+
+                if (preferredVoiceIndex === -1) {
+                    preferredVoiceIndex = filteredVoices.findIndex(
+                        voice => voice.lang.startsWith(preferredLanguage)
+                    );
+                }
+
+                if (preferredVoiceIndex === -1) {
+                    preferredVoiceIndex = 0;
+                }
+
                 filteredVoices.forEach((voice, index) => {
                     const option = document.createElement('option');
-                    const voiceName = `${voice.name} (${voice.lang})`;
-
-                    option.textContent = voiceName;
-                    option.value = index;
-
-                    if (voice.lang.startsWith(userLang) && preferredVoiceIndex === -1) {
-                        preferredVoiceIndex = index;
-                    }
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    option.value = getVoiceKey(voice);
+                    option.selected = index === preferredVoiceIndex;
                     voiceSelect.appendChild(option);
                 });
 
-                if (preferredVoiceIndex !== -1) {
-                    voiceSelect.options[preferredVoiceIndex].selected = true;
-                } else {
-                    voiceSelect.options[0].selected = true;
-                }
+                preferredVoiceURI = getVoiceKey(filteredVoices[preferredVoiceIndex]);
             } else {
                 const option = document.createElement('option');
-                option.value = "";
+                option.value = '';
                 option.textContent = getTranslation('noVoicesAvailable');
                 voiceSelect.appendChild(option);
             }
@@ -514,6 +699,7 @@
 
         textInput.addEventListener('input', () => {
             charCount.textContent = textInput.value.length;
+            scheduleUserStateSave();
         });
 
         textInput.addEventListener('paste', (e) => {
@@ -533,6 +719,7 @@
         clearInputBtn.addEventListener('click', () => {
             textInput.value = '';
             charCount.textContent = '0';
+            scheduleUserStateSave();
             showNotification(getTranslation('inputClearedNotification'));
         });
 
@@ -590,6 +777,7 @@
                     : importedText;
                 charCount.textContent = textInput.value.length;
                 textInput.focus();
+                scheduleUserStateSave();
                 showNotification(getTranslation('fileImportedNotification'));
             } catch (error) {
                 console.error('File import failed:', error);
@@ -665,6 +853,7 @@
 
                 outputArea.scrollTop = outputArea.scrollHeight;
                 updateSentences();
+                updateReadingProgress();
                 resetBtn.disabled = false;
 
                 if (pendingOutputSentences.length > 0) {
@@ -672,6 +861,7 @@
                 } else {
                     isAppendingOutput = false;
                     outputArea.scrollTop = outputArea.scrollHeight;
+                    scheduleUserStateSave();
                 }
             }
 
@@ -682,89 +872,26 @@
             sentences = Array.from(outputArea.querySelectorAll('p'));
         }
 
-        playPauseBtn.addEventListener('click', () => {
-            if (outputArea.textContent.trim() === getTranslation('outputPlaceholder')) {
-                showNotification(getTranslation('noContentToReadError'), 'error');
-                return;
-            }
-            
-            if (isPlaying) {
-                speechSynthesis.pause();
-                isPlaying = false;
-                updateButtonStates();
-                showNotification(getTranslation('readingPausedNotification'));
-            } else {
-                if (!speechUtterance || speechSynthesis.speaking === false) {
-                    startNewReading();
-                } else {
-                    speechSynthesis.resume();
-                    isPlaying = true;
-                    updateButtonStates();
-                }
-            }
-        });
-
-        navPlayPauseBtn.addEventListener('click', () => {
-            playPauseBtn.click();
-        });
-
-        function startNewReading() {
-            resetHighlight();
-
-            const text = outputArea.textContent;
-            speechUtterance = new SpeechSynthesisUtterance(text);
-
-            const selectedVoiceIndex = voiceSelect.value;
-            if (selectedVoiceIndex !== '' && voices.length > 0) {
-                speechUtterance.voice = voices[selectedVoiceIndex];
+        function getSelectedVoice() {
+            if (!voiceSelect.value) {
+                return null;
             }
 
-            speechUtterance.rate = parseFloat(rateInput.value);
-
-            speechUtterance.onboundary = (event) => {
-                if (event.name === 'sentence') {
-                    highlightCurrentSentence(event.charIndex, event.charLength);
-                }
-            };
-
-            speechUtterance.onend = () => {
-                isPlaying = false;
-                updateButtonStates();
-                resetHighlight();
-                showNotification(getTranslation('readingCompleteNotification'));
-            };
-
-            speechUtterance.onerror = (e) => {
-                console.error('Speech synthesis error:', e);
-                isPlaying = false;
-                updateButtonStates();
-                resetHighlight();
-                showNotification(getTranslation('speechErrorNotification'), 'error');
-            };
-
-            speechSynthesis.speak(speechUtterance);
-            isPlaying = true;
-            currentSentenceIndex = 0;
-            updateButtonStates();
-
-            if (sentences.length > 0) {
-                sentences[0].classList.add('highlight');
-            }
+            return voices.find(voice => getVoiceKey(voice) === voiceSelect.value) || null;
         }
 
-        function highlightCurrentSentence(charIndex, charLength) {
+        function setHighlightedSentence(index, shouldScroll = true) {
             resetHighlight();
-            
-            let currentCharCount = 0;
-            for (let i = 0; i < sentences.length; i++) {
-                currentCharCount += sentences[i].textContent.length;
-                if (charIndex + charLength <= currentCharCount) {
-                    currentSentenceIndex = i;
-                    sentences[i].classList.add('highlight');
-                    
-                    sentences[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    break;
-                }
+
+            const sentence = sentences[index];
+            if (!sentence) {
+                return;
+            }
+
+            sentence.classList.add('highlight');
+
+            if (shouldScroll && autoScrollToggle.checked) {
+                sentence.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
 
@@ -774,18 +901,176 @@
             });
         }
 
-        stopBtn.addEventListener('click', () => {
-            if (speechUtterance) {
-                speechSynthesis.cancel();
-                isPlaying = false;
+        function updateReadingProgress() {
+            const total = sentences.length;
+            const displayedSentence = hasPlaybackPosition
+                ? Math.min(currentSentenceIndex + 1, total)
+                : 0;
+
+            readingProgressValue.textContent = `${displayedSentence} / ${total}`;
+        }
+
+        function finishReading() {
+            playbackState = 'idle';
+            speechUtterance = null;
+            currentSentenceIndex = sentences.length;
+            hasPlaybackPosition = sentences.length > 0;
+
+            resetHighlight();
+            updateReadingProgress();
+            updateButtonStates();
+            scheduleUserStateSave();
+            showNotification(getTranslation('readingCompleteNotification'));
+        }
+
+        function speakCurrentSentence() {
+            if (playbackState !== 'playing') {
+                return;
+            }
+
+            if (currentSentenceIndex >= sentences.length) {
+                finishReading();
+                return;
+            }
+
+            const sentenceIndex = currentSentenceIndex;
+            const sentenceText = sentences[sentenceIndex]?.textContent.trim();
+
+            if (!sentenceText) {
+                currentSentenceIndex += 1;
+                speakCurrentSentence();
+                return;
+            }
+
+            const session = speechSessionId;
+            const utterance = new SpeechSynthesisUtterance(sentenceText);
+            const selectedVoice = getSelectedVoice();
+
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+                utterance.lang = selectedVoice.lang;
+            } else {
+                utterance.lang = document.documentElement.lang || navigator.language;
+            }
+
+            utterance.rate = parseFloat(rateInput.value) || 1;
+            speechUtterance = utterance;
+
+            setHighlightedSentence(sentenceIndex);
+            updateReadingProgress();
+
+            utterance.onend = () => {
+                const isCurrentSession = session === speechSessionId && utterance === speechUtterance;
+                if (!isCurrentSession || playbackState !== 'playing' || currentSentenceIndex !== sentenceIndex) {
+                    return;
+                }
+
+                speechUtterance = null;
+                currentSentenceIndex += 1;
+                hasPlaybackPosition = true;
+                updateReadingProgress();
+                scheduleUserStateSave();
+
+                if (currentSentenceIndex >= sentences.length) {
+                    finishReading();
+                } else {
+                    speakCurrentSentence();
+                }
+            };
+
+            utterance.onerror = (event) => {
+                const isCurrentSession = session === speechSessionId && utterance === speechUtterance;
+                if (!isCurrentSession || ['canceled', 'interrupted'].includes(event.error)) {
+                    return;
+                }
+
+                console.error('Speech synthesis error:', event);
+                speechUtterance = null;
+                playbackState = 'idle';
                 resetHighlight();
                 updateButtonStates();
+                scheduleUserStateSave();
+                showNotification(getTranslation('speechErrorNotification'), 'error');
+            };
+
+            speechSynthesis.speak(utterance);
+        }
+
+        playPauseBtn.addEventListener('click', () => {
+            if (outputArea.textContent.trim() === getTranslation('outputPlaceholder')) {
+                showNotification(getTranslation('noContentToReadError'), 'error');
+                return;
+            }
+
+            if (playbackState === 'playing') {
+                speechSynthesis.pause();
+                playbackState = 'paused';
+                updateButtonStates();
+                updateReadingProgress();
+                scheduleUserStateSave();
+                showNotification(getTranslation('readingPausedNotification'));
+                return;
+            }
+
+            if (playbackState === 'paused') {
+                if (speechUtterance && speechSynthesis.paused) {
+                    speechSynthesis.resume();
+                } else if (speechUtterance && !speechSynthesis.speaking) {
+                    speakCurrentSentence();
+                } else {
+                    speechSynthesis.resume();
+                }
+
+                playbackState = 'playing';
+                updateButtonStates();
+                updateReadingProgress();
+                scheduleUserStateSave();
+                return;
+            }
+
+            if (currentSentenceIndex >= sentences.length) {
+                currentSentenceIndex = 0;
+            }
+
+            speechSessionId += 1;
+            playbackState = 'playing';
+            hasPlaybackPosition = true;
+            updateButtonStates();
+            speakCurrentSentence();
+        });
+
+        navPlayPauseBtn.addEventListener('click', () => {
+            playPauseBtn.click();
+        });
+
+        function stopReading(shouldNotify = true) {
+            speechSessionId += 1;
+
+            if (speechUtterance || playbackState !== 'idle') {
+                speechSynthesis.cancel();
+            }
+
+            speechUtterance = null;
+            playbackState = 'idle';
+            currentSentenceIndex = 0;
+            hasPlaybackPosition = false;
+
+            resetHighlight();
+            updateReadingProgress();
+            updateButtonStates();
+            scheduleUserStateSave();
+
+            if (shouldNotify) {
                 showNotification(getTranslation('readingStoppedNotification'));
             }
+        }
+
+        stopBtn.addEventListener('click', () => {
+            stopReading();
         });
 
         navStopBtn.addEventListener('click', () => {
-            stopBtn.click();
+            stopReading();
         });
 
         resetBtn.addEventListener('click', () => {
@@ -793,10 +1078,7 @@
             const previousContent = outputArea.innerHTML;
             const previousFocus = document.activeElement;
 
-            if (isPlaying) {
-                speechSynthesis.cancel();
-                isPlaying = false;
-            }
+            stopReading(false);
 
             outputImportGeneration += 1;
             pendingOutputSentences.length = 0;
@@ -806,8 +1088,11 @@
 
             sentences = [];
             currentSentenceIndex = 0;
+            hasPlaybackPosition = false;
+            updateReadingProgress();
 
             resetBtn.disabled = true;
+            scheduleUserStateSave();
 
             const undoAction = hadContent ? {
                 label: getTranslation('undoClearButton', 'Undo'),
@@ -815,10 +1100,16 @@
                     outputArea.innerHTML = previousContent;
                     updateSentences();
                     resetHighlight();
+                    currentSentenceIndex = 0;
+                    hasPlaybackPosition = false;
+                    updateReadingProgress();
                     resetBtn.disabled = false;
+                    scheduleUserStateSave();
+
                     if (previousFocus && previousFocus.isConnected) {
                         previousFocus.focus();
                     }
+
                     showNotification(getTranslation('contentRestoredNotification'));
                 }
             } : null;
@@ -852,22 +1143,33 @@
         rateInput.addEventListener('input', () => {
             rateValue.textContent = rateInput.value;
             rateInput.setAttribute('aria-valuetext', rateInput.value);
+            scheduleUserStateSave();
+        });
 
-            if (speechUtterance) {
-                speechUtterance.rate = parseFloat(rateInput.value);
+        voiceSelect.addEventListener('change', () => {
+            preferredVoiceURI = voiceSelect.value;
+            scheduleUserStateSave();
+        });
+
+        autoScrollToggle.addEventListener('change', () => {
+            scheduleUserStateSave();
+
+            if (autoScrollToggle.checked && playbackState !== 'idle' && sentences[currentSentenceIndex]) {
+                setHighlightedSentence(currentSentenceIndex);
             }
         });
 
         function updateButtonStates() {
-            if (isPlaying) {
-                playPauseBtn.disabled = false;
-                stopBtn.disabled = false;
+            const hasActivePlayback = playbackState !== 'idle';
+
+            playPauseBtn.disabled = false;
+            stopBtn.disabled = !hasActivePlayback;
+
+            if (playbackState === 'playing') {
                 playPauseBtn.innerHTML = `<i class="fa fa-pause mr-2"></i> ${getTranslation('pauseReadingButton')}`;
                 playPauseBtn.classList.remove('bg-primary');
                 playPauseBtn.classList.add('bg-secondary');
             } else {
-                playPauseBtn.disabled = false;
-                stopBtn.disabled = true;
                 playPauseBtn.innerHTML = `<i class="fa fa-play mr-2"></i> ${getTranslation('startReadingButton')}`;
                 playPauseBtn.classList.remove('bg-secondary');
                 playPauseBtn.classList.add('bg-primary');
@@ -877,7 +1179,7 @@
             navStopBtn.disabled = stopBtn.disabled;
             navPlayPauseBtn.innerHTML = playPauseBtn.innerHTML;
             navPlayPauseBtn.classList.remove('bg-primary', 'bg-secondary');
-            navPlayPauseBtn.classList.add(isPlaying ? 'bg-secondary' : 'bg-primary');
+            navPlayPauseBtn.classList.add(playbackState === 'playing' ? 'bg-secondary' : 'bg-primary');
         }
 
         function showNotification(message, type = 'success', action = null, duration = 3000) {
@@ -1001,14 +1303,11 @@
         });
 
         themeToggle.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.toggle('dark');
-            document.body.classList.toggle('dark', isDark);
-            themeToggle.setAttribute('aria-pressed', String(isDark));
-
-            const icon = themeToggle.querySelector('i');
-            icon.classList.toggle('fa-moon-o', !isDark);
-            icon.classList.toggle('fa-sun-o', isDark);
+            applyTheme(!document.documentElement.classList.contains('dark'));
+            scheduleUserStateSave();
         });
+
+        window.addEventListener('beforeunload', saveUserStateNow);
 
         window.addEventListener('scroll', () => {
             if (window.scrollY > 10) {
@@ -1022,23 +1321,23 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const userLang = navigator.language.split('-')[0];
-            
+
             const languages = {
                 'en': 'English',
                 'zh': '简体中文',
-                'es': 'Español', // Spanish
-                'hi': 'हिन्दी',   // Hindi
-                'ar': 'العربية',  // Arabic
-                'pt': 'Português',// Portuguese
-                'bn': 'বাংলা',    // Bengali
-                'ru': 'Русский',  // Russian
-                'ja': '日本語',   // Japanese
-                'de': 'Deutsch',  // German
-                'fr': 'Français', // French
-                'ko': '한국어'    // Korean
+                'es': 'Español',
+                'hi': 'हिन्दी',
+                'ar': 'العربية',
+                'pt': 'Português',
+                'bn': 'বাংলা',
+                'ru': 'Русский',
+                'ja': '日本語',
+                'de': 'Deutsch',
+                'fr': 'Français',
+                'ko': '한국어'
             };
 
-            languageSelect.innerHTML = ''; 
+            languageSelect.innerHTML = '';
 
             for (const langCode in languages) {
                 const option = document.createElement('option');
@@ -1047,20 +1346,23 @@
                 languageSelect.appendChild(option);
             }
 
-            if (languages[userLang]) {
-                languageSelect.value = userLang;
-            } else {
-                languageSelect.value = 'en'; 
-            }
+            const savedLanguageIsValid = languages[savedUserState.language];
+            languageSelect.value = savedLanguageIsValid
+                ? savedUserState.language
+                : (languages[userLang] ? userLang : 'en');
 
+            restoreUserInterfaceState();
+            restoreOutputState();
             loadTranslations(languageSelect.value);
 
             languageSelect.addEventListener('change', (event) => {
                 loadTranslations(event.target.value);
+                scheduleUserStateSave();
             });
 
             initVoices();
             updateButtonStates();
+            updateReadingProgress();
         });
     </script>
 </body>

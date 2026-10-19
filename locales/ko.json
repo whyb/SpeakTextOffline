@@ -62,5 +62,7 @@
     "fileReadError": "파일을 읽지 못했습니다",
     "undoClearButton": "실행 취소",
     "contentRestoredNotification": "읽기 내용이 복원되었습니다",
+    "readingProgressLabel": "읽기 진행률",
+    "autoScrollLabel": "자동 스크롤",
     "selectLanguage": "언어 선택"
 }

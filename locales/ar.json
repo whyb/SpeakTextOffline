@@ -62,5 +62,7 @@
     "fileReadError": "تعذر قراءة الملف",
     "undoClearButton": "تراجع",
     "contentRestoredNotification": "تمت استعادة محتوى القراءة",
+    "readingProgressLabel": "تقدم القراءة",
+    "autoScrollLabel": "التمرير التلقائي",
     "selectLanguage": "تحديد اللغة"
 }

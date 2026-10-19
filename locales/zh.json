@@ -62,5 +62,7 @@
     "fileReadError": "文件读取失败",
     "undoClearButton": "撤销",
     "contentRestoredNotification": "朗读内容已恢复",
+    "readingProgressLabel": "朗读进度",
+    "autoScrollLabel": "自动滚动",
     "selectLanguage": "选择语言"
 }

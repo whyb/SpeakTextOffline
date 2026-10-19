@@ -62,5 +62,7 @@
     "fileReadError": "Не удалось прочитать файл",
     "undoClearButton": "Отменить",
     "contentRestoredNotification": "Содержимое чтения восстановлено",
+    "readingProgressLabel": "Прогресс чтения",
+    "autoScrollLabel": "Автопрокрутка",
     "selectLanguage": "Выбрать язык"
 }

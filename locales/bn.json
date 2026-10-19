@@ -62,5 +62,7 @@
     "fileReadError": "ফাইল পড়া ব্যর্থ হয়েছে",
     "undoClearButton": "পূর্বাবস্থায় ফেরান",
     "contentRestoredNotification": "পড়ার বিষয়বস্তু পুনরুদ্ধার করা হয়েছে",
+    "readingProgressLabel": "পড়ার অগ্রগতি",
+    "autoScrollLabel": "স্বয়ংক্রিয় স্ক্রল",
     "selectLanguage": "ভাষা নির্বাচন করুন"
 }

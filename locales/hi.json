@@ -62,5 +62,7 @@
     "fileReadError": "फ़ाइल पढ़ने में विफल",
     "undoClearButton": "पूर्ववत करें",
     "contentRestoredNotification": "पढ़ने की सामग्री पुनर्स्थापित की गई",
+    "readingProgressLabel": "पढ़ने की प्रगति",
+    "autoScrollLabel": "स्वचालित स्क्रॉल",
     "selectLanguage": "भाषा चुनें"
 }

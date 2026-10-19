@@ -62,5 +62,7 @@
     "fileReadError": "Falha ao ler o arquivo",
     "undoClearButton": "Desfazer",
     "contentRestoredNotification": "Conteúdo de leitura restaurado",
+    "readingProgressLabel": "Progresso da leitura",
+    "autoScrollLabel": "Rolagem automática",
     "selectLanguage": "Selecionar Idioma"
 }

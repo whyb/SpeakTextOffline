@@ -62,5 +62,7 @@
     "fileReadError": "ファイルを読み込めませんでした",
     "undoClearButton": "元に戻す",
     "contentRestoredNotification": "朗読内容を復元しました",
+    "readingProgressLabel": "朗読の進捗",
+    "autoScrollLabel": "自動スクロール",
     "selectLanguage": "言語を選択"
 }
