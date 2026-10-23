@@ -42,6 +42,45 @@
                 padding: 2px 4px;
                 transition: all 0.2s ease;
             }
+
+            .sentence-row {
+                display: flex;
+                align-items: flex-start;
+                gap: 0.45rem;
+            }
+
+            .sentence-speak-btn {
+                flex: 0 0 auto;
+                width: 1.45rem;
+                height: 1.45rem;
+                margin-top: 0.1rem;
+                border-radius: 9999px;
+                color: #6b7280;
+                font-size: 0.78rem;
+                line-height: 1;
+                transition: color 0.15s ease, background-color 0.15s ease;
+            }
+
+            .sentence-speak-btn:hover,
+            .sentence-speak-btn:focus-visible {
+                color: #2563eb;
+                background-color: rgba(59, 130, 246, 0.12);
+            }
+
+            .sentence-speak-btn:focus-visible {
+                outline: 2px solid #3b82f6;
+                outline-offset: 1px;
+            }
+
+            .dark .sentence-speak-btn {
+                color: #9ca3af;
+            }
+
+            .dark .sentence-speak-btn:hover,
+            .dark .sentence-speak-btn:focus-visible {
+                color: #bfdbfe;
+                background-color: rgba(59, 130, 246, 0.2);
+            }
         }
     </style>
     <style>
@@ -573,10 +612,7 @@
 
             const fragment = document.createDocumentFragment();
             storedSentences.forEach(sentenceText => {
-                const paragraph = document.createElement('p');
-                paragraph.textContent = sentenceText;
-                paragraph.className = 'mb-3 last:mb-0';
-                fragment.appendChild(paragraph);
+                fragment.appendChild(createSentenceElement(sentenceText));
             });
 
             outputArea.innerHTML = '';
@@ -837,9 +873,7 @@
                 const batchParagraphs = [];
 
                 batch.forEach(sentence => {
-                    const paragraph = document.createElement('p');
-                    paragraph.textContent = sentence;
-                    paragraph.className = 'mb-3 last:mb-0 opacity-0 transform translate-y-2 transition-all duration-300';
+                    const paragraph = createSentenceElement(sentence, true);
                     fragment.appendChild(paragraph);
                     batchParagraphs.push(paragraph);
                 });
@@ -868,8 +902,52 @@
             appendBatch();
         }
 
+        function createSentenceElement(sentenceText, isPending = false) {
+            const paragraph = document.createElement('p');
+            paragraph.className = `sentence-row mb-3 last:mb-0${isPending ? ' opacity-0 transform translate-y-2 transition-all duration-300' : ''}`;
+
+            const speakButton = document.createElement('button');
+            speakButton.type = 'button';
+            speakButton.className = 'sentence-speak-btn';
+            speakButton.dataset.i18nTitle = 'startReadingButton';
+            speakButton.dataset.i18nAriaLabel = 'startReadingButton';
+            speakButton.title = getTranslation('startReadingButton');
+            speakButton.setAttribute('aria-label', getTranslation('startReadingButton'));
+            speakButton.innerHTML = '<i class="fa fa-volume-up" aria-hidden="true"></i>';
+
+            const sentenceTextElement = document.createElement('span');
+            sentenceTextElement.className = 'sentence-text';
+            sentenceTextElement.textContent = sentenceText;
+
+            paragraph.append(speakButton, sentenceTextElement);
+            return paragraph;
+        }
+
         function updateSentences() {
-            sentences = Array.from(outputArea.querySelectorAll('p'));
+            sentences = Array.from(outputArea.querySelectorAll('.sentence-row'));
+        }
+
+        function seekToSentence(index) {
+            if (!Number.isInteger(index) || !sentences[index]) {
+                return;
+            }
+
+            speechSessionId += 1;
+
+            if (speechUtterance || speechSynthesis.speaking || speechSynthesis.paused) {
+                speechSynthesis.cancel();
+            }
+
+            speechUtterance = null;
+            currentSentenceIndex = index;
+            playbackState = 'playing';
+            hasPlaybackPosition = true;
+
+            setHighlightedSentence(index);
+            updateReadingProgress();
+            updateButtonStates();
+            scheduleUserStateSave();
+            speakCurrentSentence();
         }
 
         function getSelectedVoice() {
@@ -1041,6 +1119,18 @@
 
         navPlayPauseBtn.addEventListener('click', () => {
             playPauseBtn.click();
+        });
+
+        outputArea.addEventListener('click', (event) => {
+            const speakButton = event.target.closest('.sentence-speak-btn');
+            if (!speakButton || !outputArea.contains(speakButton)) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+            const sentence = speakButton.closest('.sentence-row');
+            seekToSentence(sentences.indexOf(sentence));
         });
 
         function stopReading(shouldNotify = true) {
