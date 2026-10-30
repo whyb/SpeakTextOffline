@@ -196,12 +196,18 @@
                 <i class="fa fa-volume-up text-primary text-2xl"></i>
                 <h1 class="text-xl md:text-2xl font-bold text-neutral" data-i18n="appTitle"></h1>
             </div>
-            <div class="flex items-center space-x-4">
+            <div class="flex flex-wrap justify-end items-center gap-x-4 gap-y-2">
+                <button id="nav-previous-sentences-btn" class="px-3 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all flex items-center text-sm disabled:opacity-50 disabled:cursor-not-allowed" data-i18n-title="previousSentencesButton" data-i18n-aria-label="previousSentencesButton" title="Previous 5 sentences" aria-label="Previous 5 sentences">
+                    <i class="fa fa-step-backward mr-2" aria-hidden="true"></i> <span data-i18n="previousSentencesButton">Previous 5 sentences</span>
+                </button>
                 <button id="nav-play-pause-btn" class="px-3 py-2 bg-primary text-white rounded-lg shadow hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all flex items-center text-sm">
                     <i class="fa fa-play mr-2"></i> <span data-i18n="startReadingButton"></span>
                 </button>
                 <button id="nav-stop-btn" class="px-3 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 focus:ring-2 focus:ring-red-400/50 focus:outline-none transition-all flex items-center text-sm disabled:opacity-50 disabled:cursor-not-allowed" data-i18n-title="stopReadingButton" disabled>
                     <i class="fa fa-stop mr-2"></i> <span data-i18n="stopReadingButton"></span>
+                </button>
+                <button id="nav-next-sentences-btn" class="px-3 py-2 bg-white text-gray-700 border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all flex items-center text-sm disabled:opacity-50 disabled:cursor-not-allowed" data-i18n-title="nextSentencesButton" data-i18n-aria-label="nextSentencesButton" title="Next 5 sentences" aria-label="Next 5 sentences">
+                    <i class="fa fa-step-forward mr-2" aria-hidden="true"></i> <span data-i18n="nextSentencesButton">Next 5 sentences</span>
                 </button>
                 <select id="language-select" class="px-3 py-2 rounded-lg border border-gray-200 text-gray-700 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none appearance-none bg-white" data-i18n-title="selectLanguage" data-i18n-aria-label="selectLanguage">
                     </select>
@@ -393,6 +399,8 @@
         const stopBtn = document.getElementById('stop-btn');
         const navPlayPauseBtn = document.getElementById('nav-play-pause-btn');
         const navStopBtn = document.getElementById('nav-stop-btn');
+        const navPreviousSentencesBtn = document.getElementById('nav-previous-sentences-btn');
+        const navNextSentencesBtn = document.getElementById('nav-next-sentences-btn');
         const resetBtn = document.getElementById('reset-btn');
         const rateInput = document.getElementById('rate');
         const rateValue = document.getElementById('rate-value');
@@ -491,8 +499,13 @@
             }
         }
 
+        const fallbackTranslations = {
+            previousSentencesButton: 'Previous 5 sentences',
+            nextSentencesButton: 'Next 5 sentences',
+        };
+
         function getTranslation(key, defaultValue = '') {
-            return translations[key] || defaultValue;
+            return translations[key] || fallbackTranslations[key] || defaultValue;
         }
 
         function applyTranslations() {
@@ -927,7 +940,7 @@
             sentences = Array.from(outputArea.querySelectorAll('.sentence-row'));
         }
 
-        function seekToSentence(index) {
+        function seekToSentence(index, shouldPlay = true) {
             if (!Number.isInteger(index) || !sentences[index]) {
                 return;
             }
@@ -940,14 +953,27 @@
 
             speechUtterance = null;
             currentSentenceIndex = index;
-            playbackState = 'playing';
+            playbackState = shouldPlay ? 'playing' : (playbackState === 'paused' ? 'paused' : 'idle');
             hasPlaybackPosition = true;
 
             setHighlightedSentence(index);
             updateReadingProgress();
             updateButtonStates();
             scheduleUserStateSave();
-            speakCurrentSentence();
+
+            if (playbackState === 'playing') {
+                speakCurrentSentence();
+            }
+        }
+
+        function seekBySentenceOffset(offset) {
+            if (sentences.length === 0) {
+                return;
+            }
+
+            const referenceIndex = hasPlaybackPosition ? currentSentenceIndex : 0;
+            const targetIndex = Math.max(0, Math.min(sentences.length - 1, referenceIndex + offset));
+            seekToSentence(targetIndex, playbackState === 'playing');
         }
 
         function getSelectedVoice() {
@@ -1091,15 +1117,15 @@
             }
 
             if (playbackState === 'paused') {
-                if (speechUtterance && speechSynthesis.paused) {
+                const hasPausedUtterance = speechUtterance && speechSynthesis.paused;
+                playbackState = 'playing';
+
+                if (hasPausedUtterance) {
                     speechSynthesis.resume();
-                } else if (speechUtterance && !speechSynthesis.speaking) {
-                    speakCurrentSentence();
                 } else {
-                    speechSynthesis.resume();
+                    speakCurrentSentence();
                 }
 
-                playbackState = 'playing';
                 updateButtonStates();
                 updateReadingProgress();
                 scheduleUserStateSave();
@@ -1121,6 +1147,14 @@
             playPauseBtn.click();
         });
 
+        navPreviousSentencesBtn.addEventListener('click', () => {
+            seekBySentenceOffset(-5);
+        });
+
+        navNextSentencesBtn.addEventListener('click', () => {
+            seekBySentenceOffset(5);
+        });
+
         outputArea.addEventListener('click', (event) => {
             const speakButton = event.target.closest('.sentence-speak-btn');
             if (!speakButton || !outputArea.contains(speakButton)) {
@@ -1130,7 +1164,7 @@
             event.preventDefault();
             event.stopPropagation();
             const sentence = speakButton.closest('.sentence-row');
-            seekToSentence(sentences.indexOf(sentence));
+            seekToSentence(sentences.indexOf(sentence), true);
         });
 
         function stopReading(shouldNotify = true) {
@@ -1254,6 +1288,8 @@
 
             playPauseBtn.disabled = false;
             stopBtn.disabled = !hasActivePlayback;
+            navPreviousSentencesBtn.disabled = sentences.length === 0;
+            navNextSentencesBtn.disabled = sentences.length === 0;
 
             if (playbackState === 'playing') {
                 playPauseBtn.innerHTML = `<i class="fa fa-pause mr-2"></i> ${getTranslation('pauseReadingButton')}`;

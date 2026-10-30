@@ -11,6 +11,8 @@
     "startReadingButton": "Начать чтение",
     "pauseReadingButton": "Приостановить чтение",
     "stopReadingButton": "Остановить чтение",
+    "previousSentencesButton": "Предыдущие 5 предложений",
+    "nextSentencesButton": "Следующие 5 предложений",
     "resetContentButton": "Сбросить содержимое",
     "selectVoiceLabel": "Выбрать голос",
     "loadingVoices": "Загрузка...",

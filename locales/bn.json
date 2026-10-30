@@ -11,6 +11,8 @@
     "startReadingButton": "পড়া শুরু করুন",
     "pauseReadingButton": "পড়া থামান",
     "stopReadingButton": "পড়া বন্ধ করুন",
+    "previousSentencesButton": "আগের ৫টি বাক্য",
+    "nextSentencesButton": "পরের ৫টি বাক্য",
     "resetContentButton": "বিষয়বস্তু রিসেট করুন",
     "selectVoiceLabel": "ভয়েস নির্বাচন করুন",
     "loadingVoices": "লোড হচ্ছে...",

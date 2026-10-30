@@ -11,6 +11,8 @@
     "startReadingButton": "Iniciar Leitura",
     "pauseReadingButton": "Pausar Leitura",
     "stopReadingButton": "Parar Leitura",
+    "previousSentencesButton": "5 frases anteriores",
+    "nextSentencesButton": "5 frases seguintes",
     "resetContentButton": "Redefinir Conteúdo",
     "selectVoiceLabel": "Selecionar Voz",
     "loadingVoices": "Carregando...",

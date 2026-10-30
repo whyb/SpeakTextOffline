@@ -11,6 +11,8 @@
     "startReadingButton": "読み上げ開始",
     "pauseReadingButton": "読み上げ一時停止",
     "stopReadingButton": "読み上げ停止",
+    "previousSentencesButton": "前の5文",
+    "nextSentencesButton": "次の5文",
     "resetContentButton": "コンテンツリセット",
     "selectVoiceLabel": "音声を選択",
     "loadingVoices": "読み込み中...",

@@ -11,6 +11,8 @@
     "startReadingButton": "بدء القراءة",
     "pauseReadingButton": "إيقاف القراءة مؤقتًا",
     "stopReadingButton": "إيقاف القراءة",
+    "previousSentencesButton": "الجمل الخمس السابقة",
+    "nextSentencesButton": "الجمل الخمس التالية",
     "resetContentButton": "إعادة تعيين المحتوى",
     "selectVoiceLabel": "اختيار الصوت",
     "loadingVoices": "جار التحميل...",

@@ -11,6 +11,8 @@
     "startReadingButton": "पढ़ना शुरू करें",
     "pauseReadingButton": "पढ़ना रोकें",
     "stopReadingButton": "पढ़ना बंद करें",
+    "previousSentencesButton": "पिछले 5 वाक्य",
+    "nextSentencesButton": "अगले 5 वाक्य",
     "resetContentButton": "सामग्री रीसेट करें",
     "selectVoiceLabel": "आवाज चुनें",
     "loadingVoices": "लोड हो रहा है...",

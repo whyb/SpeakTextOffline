@@ -11,6 +11,8 @@
     "startReadingButton": "开始朗读",
     "pauseReadingButton": "暂停朗读",
     "stopReadingButton": "停止朗读",
+    "previousSentencesButton": "前5句",
+    "nextSentencesButton": "后5句",
     "resetContentButton": "重置内容",
     "selectVoiceLabel": "选择音色",
     "loadingVoices": "加载中...",

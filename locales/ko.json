@@ -11,6 +11,8 @@
     "startReadingButton": "읽기 시작",
     "pauseReadingButton": "읽기 일시 중지",
     "stopReadingButton": "읽기 중지",
+    "previousSentencesButton": "앞으로 5문장",
+    "nextSentencesButton": "다음 5문장",
     "resetContentButton": "콘텐츠 초기화",
     "selectVoiceLabel": "음성 선택",
     "loadingVoices": "로드 중...",
