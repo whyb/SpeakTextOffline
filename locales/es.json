@@ -66,5 +66,21 @@
     "contentRestoredNotification": "Contenido de lectura restaurado",
     "readingProgressLabel": "Progreso de lectura",
     "autoScrollLabel": "Desplazamiento automático",
-    "selectLanguage": "Seleccionar Idioma"
+    "selectLanguage": "Seleccionar Idioma",
+    "nowPlaying": "Reproduciendo",
+    "readingPlaylist": "Lista de lectura",
+    "navRead": "Escuchar",
+    "navAddText": "Añadir texto",
+    "navSettings": "Ajustes",
+    "sentencesCount": "{current} / {total} frases",
+    "speedPanelTitle": "Velocidad",
+    "voicePanelTitle": "Voz",
+    "searchVoicePlaceholder": "Buscar voces...",
+    "moreOptions": "Más opciones",
+    "dragToSeekHint": "Arrastra la letra arriba o abajo para buscar",
+    "jumpToSentence": "Frase {n}",
+    "totalSentences": "{total} frases",
+    "noContentTitle": "Aún no hay nada que leer",
+    "closePanel": "Cerrar panel",
+    "noVoicesFound": "No hay voces coincidentes"
 }

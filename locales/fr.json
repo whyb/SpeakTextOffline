@@ -66,5 +66,21 @@
     "contentRestoredNotification": "Contenu de lecture restauré",
     "readingProgressLabel": "Progression de lecture",
     "autoScrollLabel": "Défilement automatique",
-    "selectLanguage": "Sélectionner la langue"
+    "selectLanguage": "Sélectionner la langue",
+    "nowPlaying": "Lecture en cours",
+    "readingPlaylist": "Liste de lecture",
+    "navRead": "Écouter",
+    "navAddText": "Ajouter du texte",
+    "navSettings": "Paramètres",
+    "sentencesCount": "{current} / {total} phrases",
+    "speedPanelTitle": "Vitesse",
+    "voicePanelTitle": "Voix",
+    "searchVoicePlaceholder": "Rechercher une voix...",
+    "moreOptions": "Plus d'options",
+    "dragToSeekHint": "Faites glisser les paroles vers le haut ou le bas pour vous déplacer",
+    "jumpToSentence": "Phrase {n}",
+    "totalSentences": "{total} phrases",
+    "noContentTitle": "Rien à lire pour le moment",
+    "closePanel": "Fermer le panneau",
+    "noVoicesFound": "Aucune voix correspondante"
 }

@@ -66,5 +66,21 @@
     "contentRestoredNotification": "朗读内容已恢复",
     "readingProgressLabel": "朗读进度",
     "autoScrollLabel": "自动滚动",
-    "selectLanguage": "选择语言"
+    "selectLanguage": "选择语言",
+    "nowPlaying": "正在播放",
+    "readingPlaylist": "朗读列表",
+    "navRead": "朗读",
+    "navAddText": "添加文本",
+    "navSettings": "设置",
+    "sentencesCount": "第 {current} 句 / 共 {total} 句",
+    "speedPanelTitle": "倍速",
+    "voicePanelTitle": "音色",
+    "searchVoicePlaceholder": "搜索音色...",
+    "moreOptions": "更多",
+    "dragToSeekHint": "上下拖拽歌词即可定位朗读位置",
+    "jumpToSentence": "第 {n} 句",
+    "totalSentences": "共 {total} 句",
+    "noContentTitle": "还没有可朗读的内容",
+    "closePanel": "关闭面板",
+    "noVoicesFound": "没有匹配的音色"
 }

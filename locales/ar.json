@@ -66,5 +66,21 @@
     "contentRestoredNotification": "تمت استعادة محتوى القراءة",
     "readingProgressLabel": "تقدم القراءة",
     "autoScrollLabel": "التمرير التلقائي",
-    "selectLanguage": "تحديد اللغة"
+    "selectLanguage": "تحديد اللغة",
+    "nowPlaying": "قيد التشغيل",
+    "readingPlaylist": "قائمة القراءة",
+    "navRead": "استماع",
+    "navAddText": "إضافة نص",
+    "navSettings": "الإعدادات",
+    "sentencesCount": "{current} / {total} جملة",
+    "speedPanelTitle": "سرعة التشغيل",
+    "voicePanelTitle": "الصوت",
+    "searchVoicePlaceholder": "ابحث عن صوت...",
+    "moreOptions": "خيارات أكثر",
+    "dragToSeekHint": "اسحب النص لأعلى أو لأسفل للانتقال",
+    "jumpToSentence": "الجملة {n}",
+    "totalSentences": "{total} جملة",
+    "noContentTitle": "لا يوجد شيء للقراءة بعد",
+    "closePanel": "إغلاق اللوحة",
+    "noVoicesFound": "لا توجد أصوات مطابقة"
 }

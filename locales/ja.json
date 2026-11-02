@@ -66,5 +66,21 @@
     "contentRestoredNotification": "朗読内容を復元しました",
     "readingProgressLabel": "朗読の進捗",
     "autoScrollLabel": "自動スクロール",
-    "selectLanguage": "言語を選択"
+    "selectLanguage": "言語を選択",
+    "nowPlaying": "再生中",
+    "readingPlaylist": "読み上げリスト",
+    "navRead": "読み上げ",
+    "navAddText": "テキスト追加",
+    "navSettings": "設定",
+    "sentencesCount": "{current} / {total} 文",
+    "speedPanelTitle": "再生速度",
+    "voicePanelTitle": "音声",
+    "searchVoicePlaceholder": "音声を検索...",
+    "moreOptions": "その他のオプション",
+    "dragToSeekHint": "歌詞を上下にドラッグして位置を移動",
+    "jumpToSentence": "{n} 番目の文",
+    "totalSentences": "全 {total} 文",
+    "noContentTitle": "読み上げる内容がありません",
+    "closePanel": "パネルを閉じる",
+    "noVoicesFound": "一致する音声がありません"
 }

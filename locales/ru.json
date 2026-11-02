@@ -66,5 +66,21 @@
     "contentRestoredNotification": "Содержимое чтения восстановлено",
     "readingProgressLabel": "Прогресс чтения",
     "autoScrollLabel": "Автопрокрутка",
-    "selectLanguage": "Выбрать язык"
+    "selectLanguage": "Выбрать язык",
+    "nowPlaying": "Сейчас читается",
+    "readingPlaylist": "Список чтения",
+    "navRead": "Чтение",
+    "navAddText": "Добавить текст",
+    "navSettings": "Настройки",
+    "sentencesCount": "{current} / {total} предложений",
+    "speedPanelTitle": "Скорость",
+    "voicePanelTitle": "Голос",
+    "searchVoicePlaceholder": "Поиск голосов...",
+    "moreOptions": "Другие параметры",
+    "dragToSeekHint": "Перетащите текст вверх или вниз, чтобы перейти",
+    "jumpToSentence": "Предложение {n}",
+    "totalSentences": "Всего {total} предложений",
+    "noContentTitle": "Пока нечего читать",
+    "closePanel": "Закрыть панель",
+    "noVoicesFound": "Подходящих голосов нет"
 }

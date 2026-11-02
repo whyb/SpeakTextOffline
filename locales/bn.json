@@ -66,5 +66,21 @@
     "contentRestoredNotification": "পড়ার বিষয়বস্তু পুনরুদ্ধার করা হয়েছে",
     "readingProgressLabel": "পড়ার অগ্রগতি",
     "autoScrollLabel": "স্বয়ংক্রিয় স্ক্রল",
-    "selectLanguage": "ভাষা নির্বাচন করুন"
+    "selectLanguage": "ভাষা নির্বাচন করুন",
+    "nowPlaying": "চলছে",
+    "readingPlaylist": "পাঠ তালিকা",
+    "navRead": "শুনুন",
+    "navAddText": "টেক্সট যোগ করুন",
+    "navSettings": "সেটিংস",
+    "sentencesCount": "{current} / {total} বাক্য",
+    "speedPanelTitle": "গতি",
+    "voicePanelTitle": "কণ্ঠস্বর",
+    "searchVoicePlaceholder": "কণ্ঠস্বর খুঁজুন...",
+    "moreOptions": "আরও বিকল্প",
+    "dragToSeekHint": "পাঠ্য উপরে বা নিচে টেনে যান",
+    "jumpToSentence": "বাক্য {n}",
+    "totalSentences": "মোট {total} বাক্য",
+    "noContentTitle": "এখনও পড়ার কিছু নেই",
+    "closePanel": "প্যানেল বন্ধ করুন",
+    "noVoicesFound": "মিলে যাওয়া কণ্ঠস্বর নেই"
 }

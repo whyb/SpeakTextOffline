@@ -66,5 +66,21 @@
     "contentRestoredNotification": "Leseinhalt wiederhergestellt",
     "readingProgressLabel": "Lesefortschritt",
     "autoScrollLabel": "Automatisch scrollen",
-    "selectLanguage": "Sprache auswählen"
+    "selectLanguage": "Sprache auswählen",
+    "nowPlaying": "Wird gelesen",
+    "readingPlaylist": "Leseliste",
+    "navRead": "Anhören",
+    "navAddText": "Text hinzufügen",
+    "navSettings": "Einstellungen",
+    "sentencesCount": "{current} / {total} Sätze",
+    "speedPanelTitle": "Geschwindigkeit",
+    "voicePanelTitle": "Stimme",
+    "searchVoicePlaceholder": "Stimmen suchen...",
+    "moreOptions": "Weitere Optionen",
+    "dragToSeekHint": "Ziehe den Text nach oben oder unten, um zu springen",
+    "jumpToSentence": "Satz {n}",
+    "totalSentences": "{total} Sätze",
+    "noContentTitle": "Noch nichts zu lesen",
+    "closePanel": "Panel schließen",
+    "noVoicesFound": "Keine passenden Stimmen"
 }

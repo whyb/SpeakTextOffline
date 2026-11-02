@@ -66,5 +66,21 @@
     "contentRestoredNotification": "읽기 내용이 복원되었습니다",
     "readingProgressLabel": "읽기 진행률",
     "autoScrollLabel": "자동 스크롤",
-    "selectLanguage": "언어 선택"
+    "selectLanguage": "언어 선택",
+    "nowPlaying": "재생 중",
+    "readingPlaylist": "읽기 목록",
+    "navRead": "읽기",
+    "navAddText": "텍스트 추가",
+    "navSettings": "설정",
+    "sentencesCount": "{current} / {total} 문장",
+    "speedPanelTitle": "재생 속도",
+    "voicePanelTitle": "음성",
+    "searchVoicePlaceholder": "음성 검색...",
+    "moreOptions": "더 많은 옵션",
+    "dragToSeekHint": "가사 위아래로 드래그하여 이동하세요",
+    "jumpToSentence": "{n}번째 문장",
+    "totalSentences": "전체 {total} 문장",
+    "noContentTitle": "아직 읽을 내용이 없습니다",
+    "closePanel": "패널 닫기",
+    "noVoicesFound": "일치하는 음성이 없습니다"
 }

@@ -66,5 +66,21 @@
     "contentRestoredNotification": "Reading content restored",
     "readingProgressLabel": "Reading progress",
     "autoScrollLabel": "Auto-scroll",
-    "selectLanguage": "Select Language"
+    "selectLanguage": "Select Language",
+    "nowPlaying": "Now playing",
+    "readingPlaylist": "Reading playlist",
+    "navRead": "Listen",
+    "navAddText": "Add text",
+    "navSettings": "Settings",
+    "sentencesCount": "{current} / {total} sentences",
+    "speedPanelTitle": "Playback speed",
+    "voicePanelTitle": "Voice",
+    "searchVoicePlaceholder": "Search voices...",
+    "moreOptions": "More options",
+    "dragToSeekHint": "Drag the lyrics up or down to seek",
+    "jumpToSentence": "Sentence {n}",
+    "totalSentences": "{total} sentences",
+    "noContentTitle": "Nothing to read yet",
+    "closePanel": "Close panel",
+    "noVoicesFound": "No matching voices"
 }
