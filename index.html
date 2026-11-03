@@ -507,7 +507,7 @@
 
         #text-input {
             width: 100%;
-            min-height: 220px;
+            min-height: 50vh;
             resize: vertical;
             padding: 16px 16px 34px;
             border-radius: 16px;
@@ -549,11 +549,73 @@
             color: var(--text-faint);
         }
 
-        .file-drop-target {
-            outline: 2px dashed rgba(59, 130, 246, 0.9);
-            outline-offset: 2px;
-            background: rgba(59, 130, 246, 0.07);
+        /* ---------- top bar pill buttons (add text / clear) ---------- */
+        .pill-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            width: auto;
+            height: 36px;
+            padding: 0 13px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--surface-soft);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
         }
+
+        .pill-btn:hover { background: var(--hover); border-color: var(--border-strong); }
+        .pill-btn:active { transform: scale(0.96); }
+        .pill-btn[aria-expanded="true"] { background: rgba(59, 130, 246, 0.14); border-color: rgba(59, 130, 246, 0.35); color: var(--text); }
+        .pill-btn i { font-size: 12px; }
+        .pill-btn .pill-caret { font-size: 9px; opacity: 0.65; }
+
+        /* ---------- file drop overlay on the lyrics area ---------- */
+        .drop-overlay {
+            position: absolute;
+            inset: 8px;
+            z-index: 6;
+            display: grid;
+            place-items: center;
+            border: 2px dashed rgba(59, 130, 246, 0.75);
+            border-radius: 22px;
+            background: rgba(59, 130, 246, 0.14);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.18s ease, visibility 0.18s ease;
+        }
+
+        .lyrics-stage.is-file-drag .drop-overlay { opacity: 1; visibility: visible; }
+
+        .drop-overlay-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+            text-align: center;
+            color: var(--text);
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .drop-overlay-inner i {
+            font-size: 36px;
+            color: #60A5FA;
+            filter: drop-shadow(0 10px 22px rgba(59, 130, 246, 0.35));
+        }
+
+        .drop-overlay-inner p { margin: 0; max-width: 320px; line-height: 1.6; }
 
         /* ---------- settings view ---------- */
         .settings-grid {
@@ -856,7 +918,7 @@
 
         .sentence-speak-btn {
             position: absolute;
-            inset-inline-end: 8px;
+            inset-inline-end: calc(100% + 44px);
             top: 50%;
             transform: translateY(-50%);
             width: 26px;
@@ -1332,6 +1394,7 @@
         .option-item .option-sub { font-size: 10.5px; color: var(--text-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .option-item .option-check { font-size: 11px; color: #10B981; opacity: 0; }
         .option-item.is-selected .option-check { opacity: 1; }
+        .option-item .option-arrow { font-size: 10px; opacity: 0.45; }
 
         .option-empty { padding: 18px 10px; text-align: center; font-size: 12px; color: var(--text-faint); }
 
@@ -1423,6 +1486,8 @@
 
         .modal-card.is-open { transform: scale(1); opacity: 1; }
 
+        .modal-card.is-wide { max-width: 42rem; }
+
         .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
         .modal-head h3 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.015em; }
 
@@ -1482,6 +1547,9 @@
             .top-bar-actions { gap: 0; }
             .top-bar-actions .icon-btn { width: 32px; height: 32px; font-size: 13px; }
 
+            .pill-btn { width: 32px; height: 32px; padding: 0; }
+            .pill-btn .pill-label, .pill-btn .pill-caret { display: none; }
+
             .lyrics-header { padding: 12px 18px 0; }
             .lyrics-hint { padding: 4px 16px 8px; font-size: 10px; }
             #lyrics-viewport { padding: 0 6px; }
@@ -1489,6 +1557,7 @@
             .sentence-row { padding: 10px 22px; }
             .sentence-row.is-current { font-size: clamp(1.25rem, 5.4vw, 1.7rem); }
             .sentence-row.is-near { font-size: clamp(1rem, 3.6vw, 1.2rem); }
+            .sentence-speak-btn { display: none; }
 
             .view-scroll { padding: 16px 14px 30px; }
             .card { padding: 18px; border-radius: 18px; }
@@ -1562,10 +1631,6 @@
                 <i class="fa fa-play-circle" aria-hidden="true"></i>
                 <span data-i18n="navRead"></span>
             </button>
-            <button type="button" class="nav-item" data-view="add">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                <span data-i18n="navAddText"></span>
-            </button>
             <button type="button" class="nav-item" data-view="settings">
                 <i class="fa fa-sliders" aria-hidden="true"></i>
                 <span data-i18n="navSettings"></span>
@@ -1591,16 +1656,21 @@
                 <h1 class="top-bar-title" id="topbar-title"></h1>
             </div>
             <div class="top-bar-actions">
+                <button type="button" id="add-text-btn" class="pill-btn" data-popover-trigger="addtext-popover"
+                    data-i18n-title="addTextButton" data-i18n-aria-label="addTextButton"
+                    aria-haspopup="menu" aria-expanded="false" aria-controls="addtext-popover">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                    <span class="pill-label" data-i18n="addTextButton"></span>
+                    <i class="fa fa-caret-down pill-caret" aria-hidden="true"></i>
+                </button>
+                <button type="button" id="clear-btn" class="pill-btn" data-i18n-title="clearContentTitle" data-i18n-aria-label="clearContentTitle">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                    <span class="pill-label" data-i18n="clearContentTitle"></span>
+                </button>
+                <span class="top-bar-divider" aria-hidden="true"></span>
                 <button type="button" id="copy-btn" class="icon-btn" data-i18n-title="copyContentTitle" data-i18n-aria-label="copyContentTitle">
                     <i class="fa fa-copy" aria-hidden="true"></i>
                 </button>
-                <button type="button" id="clear-btn" class="icon-btn" data-i18n-title="clearContentTitle" data-i18n-aria-label="clearContentTitle">
-                    <i class="fa fa-trash" aria-hidden="true"></i>
-                </button>
-                <button type="button" id="import-btn" class="icon-btn" data-i18n-title="navAddText" data-i18n-aria-label="navAddText">
-                    <i class="fa fa-plus" aria-hidden="true"></i>
-                </button>
-                <span class="top-bar-divider" aria-hidden="true"></span>
                 <button type="button" id="theme-toggle" class="icon-btn" data-theme-toggle data-i18n-title="themeToggleTitle" data-i18n-aria-label="themeToggleTitle" aria-pressed="false">
                     <i class="fa fa-moon-o" aria-hidden="true"></i>
                 </button>
@@ -1621,7 +1691,7 @@
                     <span class="lyrics-count" id="lyrics-count" data-i18n-title="readingPlaylist">0</span>
                 </div>
 
-                <div class="lyrics-stage">
+                <div class="lyrics-stage" id="lyrics-stage">
                     <div id="lyrics-viewport" role="region" aria-labelledby="reading-content-title" tabindex="0">
                         <div id="lyrics-track"></div>
                     </div>
@@ -1630,10 +1700,17 @@
                         <div class="lyrics-empty-icon"><i class="fa fa-file-audio-o" aria-hidden="true"></i></div>
                         <h3 data-i18n="noContentTitle"></h3>
                         <p data-i18n="outputPlaceholder"></p>
-                        <button type="button" class="btn btn-primary" data-view-target="add">
+                        <button type="button" class="btn btn-primary" data-action="add-text">
                             <i class="fa fa-plus" aria-hidden="true"></i>
                             <span data-i18n="navAddText"></span>
                         </button>
+                    </div>
+
+                    <div class="drop-overlay" id="file-drop-overlay" aria-hidden="true">
+                        <div class="drop-overlay-inner">
+                            <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                            <p data-i18n="dropToReplaceHint"></p>
+                        </div>
                     </div>
                 </div>
 
@@ -1641,49 +1718,6 @@
                     <i class="fa fa-arrows-v" aria-hidden="true"></i>
                     <span data-i18n="dragToSeekHint"></span>
                 </p>
-            </section>
-
-            <!-- ============ ADD TEXT VIEW ============ -->
-            <section class="view-panel" id="view-add" data-view-panel="add" hidden>
-                <div class="view-scroll">
-                    <div class="card" id="input-card">
-                        <h2 class="card-title">
-                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                            <span data-i18n="inputAreaTitle"></span>
-                        </h2>
-                        <div class="textarea-wrap">
-                            <textarea id="text-input"
-                                data-i18n-placeholder="inputPlaceholder"
-                                data-i18n-aria-label="inputAreaTitle"
-                                aria-describedby="drop-hint"></textarea>
-                            <div class="char-count">
-                                <span id="char-count">0</span> <span data-i18n="characters"></span>
-                            </div>
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" id="add-to-reading" class="btn btn-primary">
-                                <i class="fa fa-plus" aria-hidden="true"></i>
-                                <span data-i18n="addToReadingButton"></span>
-                            </button>
-                            <button type="button" id="clear-input" class="btn btn-ghost">
-                                <i class="fa fa-eraser" aria-hidden="true"></i>
-                                <span data-i18n="clearInputButton"></span>
-                            </button>
-                        </div>
-                        <p class="drop-hint" id="drop-hint">
-                            <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                            <span data-i18n="dropFilesHint"></span>
-                        </p>
-                    </div>
-
-                    <div class="card">
-                        <h2 class="card-title">
-                            <i class="fa fa-info-circle" aria-hidden="true"></i>
-                            <span data-i18n="aboutToolTitle"></span>
-                        </h2>
-                        <p class="about-text" data-i18n="aboutToolDescription"></p>
-                    </div>
-                </div>
             </section>
 
             <!-- ============ SETTINGS VIEW ============ -->
@@ -1772,6 +1806,7 @@
                             <i class="fa fa-info-circle" aria-hidden="true"></i>
                             <span data-i18n="aboutToolTitle"></span>
                         </h2>
+                        <p class="about-text" data-i18n="aboutToolDescription"></p>
                         <p class="about-text" data-i18n="footerTagline"></p>
                         <div class="about-footer">
                             <span data-i18n="footerCopyright"></span>
@@ -1853,6 +1888,27 @@
 
 <!-- ======================= popovers ======================= -->
 <div class="popover-layer" id="popover-layer">
+    <div class="popover" id="addtext-popover" role="menu" aria-labelledby="addtext-popover-title" hidden>
+        <div class="popover-head">
+            <h3 id="addtext-popover-title" data-i18n="addTextButton"></h3>
+            <button type="button" class="icon-btn" data-popover-close data-i18n-aria-label="closePanel" data-i18n-title="closePanel">
+                <i class="fa fa-times" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="option-list">
+            <button type="button" class="option-item" role="menuitem" data-add-text-action="input">
+                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                <span class="option-main"><span class="option-name" data-i18n="addTextMenuInput"></span></span>
+                <i class="fa fa-angle-right option-arrow" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="option-item" role="menuitem" data-add-text-action="file">
+                <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                <span class="option-main"><span class="option-name" data-i18n="addTextMenuFile"></span></span>
+                <i class="fa fa-angle-right option-arrow" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
     <div class="popover" id="speed-popover" role="dialog" aria-labelledby="speed-popover-title" hidden>
         <div class="popover-head">
             <h3 id="speed-popover-title" data-i18n="speedPanelTitle"></h3>
@@ -1965,6 +2021,55 @@
     </div>
 </div>
 
+<!-- ======================= text input modal ======================= -->
+<div id="text-modal" role="dialog" aria-modal="true" aria-labelledby="text-modal-title" aria-hidden="true" class="modal-backdrop" hidden>
+    <div class="modal-card is-wide" id="text-modal-card">
+        <div class="modal-head">
+            <h3 id="text-modal-title" data-i18n="textInputModalTitle"></h3>
+            <button type="button" id="close-text-modal" class="icon-btn" data-i18n-aria-label="closePanel" data-i18n-title="closePanel">
+                <i class="fa fa-times" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="textarea-wrap">
+                <textarea id="text-input"
+                    data-i18n-placeholder="inputPlaceholder"
+                    data-i18n-aria-label="inputAreaTitle"
+                    aria-describedby="drop-hint"></textarea>
+                <div class="char-count">
+                    <span id="char-count">0</span> <span data-i18n="characters"></span>
+                </div>
+            </div>
+            <p class="drop-hint" id="drop-hint">
+                <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                <span data-i18n="dropFilesHint"></span>
+            </p>
+        </div>
+        <div class="form-actions" style="margin-top: 16px; justify-content: flex-end;">
+            <button type="button" id="clear-input" class="btn btn-ghost">
+                <i class="fa fa-eraser" aria-hidden="true"></i>
+                <span data-i18n="clearInputButton"></span>
+            </button>
+            <button type="button" id="add-to-reading" class="btn btn-ghost">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                <span data-i18n="addToReadingButton"></span>
+            </button>
+            <button type="button" id="text-cancel" class="btn btn-ghost">
+                <i class="fa fa-times" aria-hidden="true"></i>
+                <span data-i18n="textInputCancel"></span>
+            </button>
+            <button type="button" id="text-confirm" class="btn btn-primary">
+                <i class="fa fa-check" aria-hidden="true"></i>
+                <span data-i18n="textInputConfirm"></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<input type="file" id="file-input" class="sr-only" tabindex="-1" aria-hidden="true" multiple
+    accept=".txt,.md,.markdown,.rtf,.tex,.latex,.log,.nfo,text/plain,text/markdown"
+    data-i18n-aria-label="addTextMenuFile">
+
 <script>
 const synth = window.speechSynthesis;
 const USER_STATE_STORAGE_KEY = 'speakTextOfflineUserState.v1';
@@ -1977,9 +2082,15 @@ const lyricsTrack = document.getElementById('lyrics-track');
 const lyricsEmpty = document.getElementById('lyrics-empty');
 const lyricsCount = document.getElementById('lyrics-count');
 const charCount = document.getElementById('char-count');
-const inputCard = document.getElementById('input-card');
 const addToReadingBtn = document.getElementById('add-to-reading');
 const clearInputBtn = document.getElementById('clear-input');
+const textConfirmBtn = document.getElementById('text-confirm');
+const textCancelBtn = document.getElementById('text-cancel');
+const textModal = document.getElementById('text-modal');
+const textModalCard = document.getElementById('text-modal-card');
+const closeTextModalBtn = document.getElementById('close-text-modal');
+const fileInput = document.getElementById('file-input');
+const lyricsStage = document.getElementById('lyrics-stage');
 
 const playerBar = document.getElementById('player-bar');
 const playerCover = document.getElementById('player-cover');
@@ -2009,7 +2120,6 @@ const languageList = document.getElementById('language-list');
 const autoScrollToggle = document.getElementById('auto-scroll-toggle');
 const copyBtn = document.getElementById('copy-btn');
 const clearBtn = document.getElementById('clear-btn');
-const importBtn = document.getElementById('import-btn');
 const sidebarSummary = document.getElementById('sidebar-summary');
 const sidebarRate = document.getElementById('sidebar-rate');
 const sidebarVoice = document.getElementById('sidebar-voice');
@@ -2038,7 +2148,10 @@ let sentences = [];
 let translations = {};
 let helpModalPreviousFocus = null;
 let isHelpModalOpen = false;
+let textModalPreviousFocus = null;
+let isTextModalOpen = false;
 let fileDragDepth = 0;
+let isFileDragActive = false;
 let isAppendingOutput = false;
 let outputImportGeneration = 0;
 let stateSaveTimer = null;
@@ -2153,7 +2266,20 @@ const fallbackTranslations = {
     totalSentences: '{total} sentences',
     noContentTitle: 'Nothing to read yet',
     closePanel: 'Close panel',
-    noVoicesFound: 'No matching voices'
+    noVoicesFound: 'No matching voices',
+    addTextButton: 'Add text',
+    addTextMenuInput: 'Enter text manually',
+    addTextMenuFile: 'Choose files from disk',
+    textInputModalTitle: 'Enter reading text',
+    textInputConfirm: 'Confirm',
+    textInputCancel: 'Cancel',
+    textUpdatedNotification: 'Content updated',
+    fileReplacedNotification: 'Reading content replaced with {count} file(s)',
+    dropToReplaceHint: 'Drop to replace the current reading content',
+    unsupportedFileError: 'Unsupported file format. Supported: txt, md, markdown, rtf, tex, latex, log, nfo',
+    noSupportedFilesError: 'No supported files were found',
+    emptyFileError: 'The file is empty',
+    currentSentenceShort: 'Sentence {current} / {total}'
 };
 
 function getTranslation(key, defaultValue = '') {
@@ -2661,8 +2787,9 @@ function createSentenceElement(sentenceText, isPending = false) {
     sentenceTextElement.className = 'sentence-text';
     sentenceTextElement.textContent = sentenceText;
     sentenceTextElement.prepend(eq);
+    sentenceTextElement.prepend(speakButton);
 
-    row.append(speakButton, sentenceTextElement);
+    row.appendChild(sentenceTextElement);
     return row;
 }
 
@@ -2873,7 +3000,7 @@ function updatePlayerUI() {
 
     playerTitle.textContent = getTrackTitle();
 
-    readingProgressValue.textContent = t('sentencesCount', { current: displayed, total });
+    readingProgressValue.textContent = t('currentSentenceShort', { current: displayed, total });
     progressCurrent.textContent = String(displayed);
     progressTotal.textContent = String(total);
 
@@ -2937,7 +3064,6 @@ function buildSpeedPresets() {
 function updateTopBar() {
     const map = {
         read: 'nowPlaying',
-        add: 'navAddText',
         settings: 'navSettings'
     };
     topbarEyebrow.textContent = getTranslation(map[currentView] || 'nowPlaying');
@@ -2945,8 +3071,6 @@ function updateTopBar() {
 
     if (currentView === 'read') {
         topbarTitle.textContent = getTrackTitle();
-    } else if (currentView === 'add') {
-        topbarTitle.textContent = getTranslation('inputAreaTitle');
     } else {
         topbarTitle.textContent = getTranslation('readingControlsTitle');
     }
@@ -3191,17 +3315,28 @@ function restoreOutputState() {
 /* =========================================================
    notifications
    ========================================================= */
+const activeNotificationSlots = new Set();
+
 function showNotification(message, type = 'success', action = null, duration = 3000) {
     const notification = document.createElement('div');
     notification.className = `notification${type === 'error' ? ' is-error' : ''}`;
     notification.setAttribute('role', type === 'error' ? 'alert' : 'status');
     notification.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
 
+    // Stack multiple toasts instead of letting them overlap.
+    let slot = 0;
+    while (activeNotificationSlots.has(slot)) {
+        slot += 1;
+    }
+    activeNotificationSlots.add(slot);
+    notification.style.bottom = `calc(var(--player-h) + 18px + ${slot * 62}px)`;
+
     const text = document.createElement('span');
     text.textContent = message;
     notification.appendChild(text);
 
     const removeNotification = () => {
+        activeNotificationSlots.delete(slot);
         if (notification.isConnected) {
             document.body.removeChild(notification);
         }
@@ -3271,6 +3406,7 @@ function positionPopover(popover, trigger) {
     left = Math.max(margin, Math.min(left, viewportWidth - width - margin));
     top = Math.max(margin, top);
 
+    popover.style.transformOrigin = trigger && top >= (trigger.getBoundingClientRect().bottom - 4) ? 'top' : 'bottom';
     popover.style.left = `${Math.round(left)}px`;
     popover.style.top = `${Math.round(top)}px`;
 }
@@ -3454,6 +3590,9 @@ function handleDragMove() {
 }
 
 function onLyricsPointerDown(event) {
+    if (isFileDragActive) {
+        return;
+    }
     if (event.pointerType === 'mouse' && event.button !== 0) {
         return;
     }
@@ -3650,6 +3789,238 @@ function clearReadingContent() {
 }
 
 /* =========================================================
+   replace content (manual input + dropped / picked files)
+   ========================================================= */
+function replaceContent(rawText, options = {}) {
+    const {
+        message = getTranslation('textUpdatedNotification'),
+        preserveWhitespace = false
+    } = options;
+
+    let text = String(rawText || '');
+    text = text.replace(/^[\s\u3000]+|[\s\u3000]+$/g, '');
+
+    if (!preserveWhitespace) {
+        text = text.replace(/\n{2,}/g, '\n');
+    }
+
+    const trimPattern = preserveWhitespace ? /^[ \t\u3000]+|[ \t\u3000]+$/g : /^[\s\u3000]+|[\s\u3000]+$/g;
+    const newSentences = splitIntoSentences(text)
+        .map(sentence => sentence.replace(trimPattern, ''))
+        .filter(Boolean);
+
+    if (newSentences.length === 0) {
+        showNotification(getTranslation('emptyInputError'), 'error');
+        return false;
+    }
+
+    const previousSentences = getStoredOutputSentences();
+    const previousIndex = currentSentenceIndex;
+    const previousHasPosition = hasPlaybackPosition;
+
+    stopReading(false);
+
+    outputImportGeneration += 1;
+    pendingOutputSentences.length = 0;
+    isAppendingOutput = false;
+
+    lyricsTrack.innerHTML = '';
+    lyricsTrack.style.transform = 'translateY(0px)';
+    trackTranslate = 0;
+    sentences = [];
+    currentSentenceIndex = 0;
+    hasPlaybackPosition = false;
+    lastStyledIndex = -1;
+
+    renderEmptyState();
+    updateSentenceStyles();
+    updatePlayerUI();
+
+    newSentences.forEach(sentence => pendingOutputSentences.push(sentence));
+    processPendingOutputSentences();
+    resetBtn.disabled = false;
+    scheduleUserStateSave();
+
+    const undoAction = previousSentences.length > 0 ? {
+        label: getTranslation('undoClearButton', 'Undo'),
+        onAction: () => {
+            outputImportGeneration += 1;
+            const fragment = document.createDocumentFragment();
+            previousSentences.forEach(sentenceText => {
+                fragment.appendChild(createSentenceElement(sentenceText));
+            });
+            lyricsTrack.innerHTML = '';
+            lyricsTrack.appendChild(fragment);
+
+            updateSentences();
+            currentSentenceIndex = Math.min(previousIndex, sentences.length);
+            hasPlaybackPosition = previousHasPosition;
+
+            renderEmptyState();
+            updateSentenceStyles();
+            centerCurrentSentence(false, true);
+            updatePlayerUI();
+            resetBtn.disabled = sentences.length === 0;
+            scheduleUserStateSave();
+            showNotification(getTranslation('contentRestoredNotification'));
+        }
+    } : null;
+
+    showNotification(message, 'success', undoAction, 8000);
+    return true;
+}
+
+/* =========================================================
+   files: read, RTF stripping, import
+   ========================================================= */
+const SUPPORTED_FILE_PATTERN = /\.(txt|md|markdown|rtf|tex|latex|log|nfo)$/i;
+const PRESERVE_WHITESPACE_PATTERN = /\.(log|nfo)$/i;
+
+function stripRtf(raw) {
+    const source = String(raw || '');
+    try {
+        if (!/^\s*\{\\rtf/i.test(source)) {
+            return source;
+        }
+
+        let text = source;
+        text = text.replace(/\{\\\*\\generator[^{}]*\}/g, '');
+        text = text.replace(/\\'([0-9a-fA-F]{2})/g, (match, hex) => String.fromCharCode(parseInt(hex, 16)));
+        text = text.replace(/\\u(-?\d+)\s*\??/g, (match, code) => {
+            const value = Number(code);
+            return String.fromCharCode(value < 0 ? value + 65536 : value);
+        });
+        text = text.replace(/\\(par|line|sect|page)\b[ ]?/g, '\n');
+        text = text.replace(/\\tab\b[ ]?/g, '\t');
+        text = text.replace(/\\[a-zA-Z]+-?\d*[ ]?/g, '');
+        text = text.replace(/[{}]/g, '');
+        text = text.replace(/\\\\/g, '\\');
+        text = text.replace(/\\(?=[{}\\])/g, '');
+        text = text.replace(/\n{3,}/g, '\n\n');
+
+        const stripped = text.trim();
+        return stripped || source;
+    } catch (error) {
+        console.warn('RTF stripping failed, keeping raw text:', error);
+        return source;
+    }
+}
+
+async function readFiles(fileList) {
+    const files = Array.from(fileList || []);
+    const supported = files.filter(file => SUPPORTED_FILE_PATTERN.test(file.name));
+    const parts = [];
+    let preserveWhitespace = supported.length > 0;
+
+    for (const file of supported) {
+        let text = await file.text();
+        if (/\.rtf$/i.test(file.name)) {
+            text = stripRtf(text);
+        }
+        if (!PRESERVE_WHITESPACE_PATTERN.test(file.name)) {
+            preserveWhitespace = false;
+        }
+        parts.push(text);
+    }
+
+    return {
+        text: parts.join('\n\n'),
+        accepted: supported.length,
+        rejected: files.length - supported.length,
+        preserveWhitespace
+    };
+}
+
+async function importFiles(fileList) {
+    const files = Array.from(fileList || []);
+
+    if (files.length === 0) {
+        showNotification(getTranslation('noSupportedFilesError'), 'error');
+        return;
+    }
+
+    try {
+        const result = await readFiles(files);
+
+        if (result.accepted === 0) {
+            showNotification(getTranslation('unsupportedFileError'), 'error');
+            return;
+        }
+
+        if (!result.text.trim()) {
+            showNotification(getTranslation('emptyFileError'), 'error');
+            return;
+        }
+
+        replaceContent(result.text, {
+            message: t('fileReplacedNotification', { count: result.accepted }),
+            preserveWhitespace: result.preserveWhitespace
+        });
+    } catch (error) {
+        console.error('File import failed:', error);
+        showNotification(getTranslation('fileReadError'), 'error');
+    }
+}
+
+function resetFileDragState() {
+    fileDragDepth = 0;
+    isFileDragActive = false;
+    if (lyricsStage) {
+        lyricsStage.classList.remove('is-file-drag');
+    }
+}
+
+function hasFilesInEvent(event) {
+    return Array.from(event.dataTransfer?.types || []).includes('Files');
+}
+
+/* =========================================================
+   text input modal
+   ========================================================= */
+function openTextModal() {
+    if (isTextModalOpen) {
+        return;
+    }
+
+    closeAllPopovers();
+    isTextModalOpen = true;
+    textModalPreviousFocus = document.activeElement;
+
+    textModal.hidden = false;
+    textModal.setAttribute('aria-hidden', 'false');
+    applyTranslations();
+
+    requestAnimationFrame(() => {
+        textModalCard.classList.add('is-open');
+        textInput.focus();
+    });
+}
+
+function closeTextModal() {
+    if (!isTextModalOpen) {
+        return;
+    }
+
+    isTextModalOpen = false;
+    textModalCard.classList.remove('is-open');
+
+    setTimeout(() => {
+        if (isTextModalOpen) {
+            return;
+        }
+        textModal.hidden = true;
+        textModal.setAttribute('aria-hidden', 'true');
+
+        const previous = textModalPreviousFocus;
+        const canRestore = previous && previous.isConnected && previous.offsetParent !== null;
+        const focusTarget = canRestore ? previous : document.getElementById('add-text-btn');
+        if (focusTarget) {
+            focusTarget.focus({ preventScroll: true });
+        }
+    }, 230);
+}
+
+/* =========================================================
    help modal
    ========================================================= */
 function openHelpModal() {
@@ -3691,10 +4062,10 @@ function closeHelpModal() {
     }, 230);
 }
 
-function trapModalFocus(event) {
+function trapModalFocus(event, modal, closeFn) {
     if (event.key === 'Escape') {
         event.preventDefault();
-        closeHelpModal();
+        closeFn();
         return;
     }
 
@@ -3702,7 +4073,7 @@ function trapModalFocus(event) {
         return;
     }
 
-    const focusableElements = Array.from(helpModal.querySelectorAll(
+    const focusableElements = Array.from(modal.querySelectorAll(
         'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
     )).filter(element => element.offsetParent !== null);
 
@@ -3727,7 +4098,7 @@ function trapModalFocus(event) {
    view switching
    ========================================================= */
 function switchView(name) {
-    if (!['read', 'add', 'settings'].includes(name)) {
+    if (!['read', 'settings'].includes(name)) {
         return;
     }
 
@@ -3771,7 +4142,34 @@ document.querySelectorAll('[data-view-target]').forEach(button => {
     button.addEventListener('click', () => switchView(button.dataset.viewTarget));
 });
 
-importBtn.addEventListener('click', () => switchView('add'));
+// ---- add text dropdown ----
+document.querySelectorAll('[data-action="add-text"]').forEach(button => {
+    button.addEventListener('click', event => {
+        event.stopPropagation();
+        openPopover('addtext-popover', button);
+    });
+});
+
+document.querySelectorAll('[data-add-text-action]').forEach(button => {
+    button.addEventListener('click', () => {
+        const action = button.dataset.addTextAction;
+        closeAllPopovers();
+
+        if (action === 'input') {
+            openTextModal();
+        } else if (action === 'file') {
+            fileInput.click();
+        }
+    });
+});
+
+fileInput.addEventListener('change', () => {
+    const files = Array.from(fileInput.files || []);
+    fileInput.value = '';
+    if (files.length > 0) {
+        importFiles(files);
+    }
+});
 
 // ---- transport ----
 playPauseBtn.addEventListener('click', togglePlayback);
@@ -3897,12 +4295,29 @@ addToReadingBtn.addEventListener('click', () => {
         return;
     }
 
-    const wasEmpty = sentences.length === 0;
     appendToOutput(text);
     showNotification(getTranslation('textAddedNotification'));
+    closeTextModal();
+});
 
-    if (wasEmpty) {
-        switchView('read');
+textConfirmBtn.addEventListener('click', () => {
+    const text = textInput.value.trim();
+    if (!text) {
+        showNotification(getTranslation('emptyInputError'), 'error');
+        return;
+    }
+
+    if (replaceContent(text)) {
+        closeTextModal();
+    }
+});
+
+textCancelBtn.addEventListener('click', closeTextModal);
+closeTextModalBtn.addEventListener('click', closeTextModal);
+
+textModal.addEventListener('click', event => {
+    if (event.target === textModal) {
+        closeTextModal();
     }
 });
 
@@ -3913,66 +4328,51 @@ clearInputBtn.addEventListener('click', () => {
     showNotification(getTranslation('inputClearedNotification'));
 });
 
-// ---- file drag and drop ----
-inputCard.addEventListener('dragenter', event => {
-    if (!Array.from(event.dataTransfer?.types || []).includes('Files')) {
+// ---- file drag and drop (drop onto the lyrics area replaces the reading content) ----
+lyricsStage.addEventListener('dragenter', event => {
+    if (!hasFilesInEvent(event)) {
         return;
     }
     event.preventDefault();
     fileDragDepth += 1;
-    inputCard.classList.add('file-drop-target');
+    isFileDragActive = true;
+    lyricsStage.classList.add('is-file-drag');
 });
 
-inputCard.addEventListener('dragover', event => {
-    if (!Array.from(event.dataTransfer?.types || []).includes('Files')) {
+lyricsStage.addEventListener('dragover', event => {
+    if (!hasFilesInEvent(event)) {
         return;
     }
     event.preventDefault();
     event.dataTransfer.dropEffect = 'copy';
 });
 
-inputCard.addEventListener('dragleave', () => {
+lyricsStage.addEventListener('dragleave', () => {
     fileDragDepth = Math.max(0, fileDragDepth - 1);
     if (fileDragDepth === 0) {
-        inputCard.classList.remove('file-drop-target');
+        resetFileDragState();
     }
 });
 
-inputCard.addEventListener('drop', async event => {
-    event.preventDefault();
-    fileDragDepth = 0;
-    inputCard.classList.remove('file-drop-target');
-
-    const files = Array.from(event.dataTransfer?.files || []);
-    const textFiles = files.filter(file => /\.(txt|md)$/i.test(file.name));
-
-    if (textFiles.length === 0) {
-        showNotification(getTranslation('unsupportedFileError'), 'error');
+lyricsStage.addEventListener('drop', event => {
+    if (!hasFilesInEvent(event)) {
         return;
     }
+    event.preventDefault();
+    resetFileDragState();
+    importFiles(event.dataTransfer?.files || []);
+});
 
-    try {
-        const importedParts = [];
-        for (const file of textFiles) {
-            importedParts.push(await file.text());
-        }
-
-        const importedText = importedParts.join('\n\n').trim();
-        if (!importedText) {
-            showNotification(getTranslation('emptyInputError'), 'error');
-            return;
-        }
-
-        textInput.value = textInput.value.trim()
-            ? `${textInput.value.trim()}\n\n${importedText}`
-            : importedText;
-        charCount.textContent = String(textInput.value.length);
-        textInput.focus();
-        scheduleUserStateSave();
-        showNotification(getTranslation('fileImportedNotification'));
-    } catch (error) {
-        console.error('File import failed:', error);
-        showNotification(getTranslation('fileReadError'), 'error');
+window.addEventListener('dragend', resetFileDragState);
+window.addEventListener('drop', event => {
+    if (hasFilesInEvent(event)) {
+        event.preventDefault();
+    }
+    resetFileDragState();
+});
+window.addEventListener('dragover', event => {
+    if (hasFilesInEvent(event)) {
+        event.preventDefault();
     }
 });
 
@@ -4071,7 +4471,12 @@ document.addEventListener('pointerdown', event => {
 // ---- keyboard ----
 document.addEventListener('keydown', event => {
     if (isHelpModalOpen) {
-        trapModalFocus(event);
+        trapModalFocus(event, helpModal, closeHelpModal);
+        return;
+    }
+
+    if (isTextModalOpen) {
+        trapModalFocus(event, textModal, closeTextModal);
         return;
     }
 
@@ -4079,6 +4484,24 @@ document.addEventListener('keydown', event => {
         if (activePopover) {
             event.preventDefault();
             closeAllPopovers(true);
+        }
+        return;
+    }
+
+    if (activePopover && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+        const target = event.target;
+        const isTextEntry = target && target.closest && target.closest('input, textarea, select');
+        const items = Array.from(activePopover.querySelectorAll('button:not([disabled])'))
+            .filter(element => element.offsetParent !== null);
+
+        if (!isTextEntry && items.length > 0) {
+            event.preventDefault();
+            const currentIndex = items.indexOf(document.activeElement);
+            const step = event.key === 'ArrowDown' ? 1 : -1;
+            const nextIndex = currentIndex === -1
+                ? (step === 1 ? 0 : items.length - 1)
+                : (currentIndex + step + items.length) % items.length;
+            items[nextIndex].focus();
         }
         return;
     }
