@@ -1,6 +1,8 @@
 # SpeakTextOffline
 SpeakTextOffline 是一个由 JavaScript 驱动的离线文本转语音 Web 应用程序，采用响应式设计。它支持语音选择、播放控制和自动句子高亮功能，为用户提供了更加优质的聆听体验。
 
+![screenshot-en](imgs/screenshot-cn.jpg)
+
 # Key Features
 
 1. **离线文本转语音**：本应用程序利用 [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisUtterance) 提供本地文本转语音功能，无需联网。这意味着您可以随时随地使用它，即使在网络覆盖不佳或没有网络的区域也能正常使用。

@@ -3,6 +3,8 @@
 
 A JavaScript-powered(Offline) text-to-speech web app with responsive design. Supports voice selection, playback controls, and automatic sentence highlighting for an enhanced listening experience.
 
+![screenshot-en](imgs/screenshot-en.jpg)
+
 # Key Features
 
 1. Offline Text-to-Speech: Leveraging the Web Speech API, this application offers local text-to-speech capabilities without relying on an internet connection. This means you can use it anytime, anywhere, even in areas with poor or no network coverage.
