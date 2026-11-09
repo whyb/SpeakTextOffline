@@ -68,6 +68,8 @@ window.locales['bn'] = {
   "readingProgressLabel": "পড়ার অগ্রগতি",
   "autoScrollLabel": "স্বয়ংক্রিয় স্ক্রল",
   "selectLanguage": "ভাষা নির্বাচন করুন",
+  "textReplaceLabel": "টেক্সট প্রতিস্থাপন",
+  "textReplaceHint": "এখানে লেখা অক্ষরগুলো পড়া শুরু হওয়ার আগে টেক্সট থেকে মুছে ফেলা হয় (ডিসপ্লে প্রভাবিত হয় না)",
   "nowPlaying": "চলছে",
   "readingPlaylist": "পাঠ তালিকা",
   "navRead": "শুনুন",

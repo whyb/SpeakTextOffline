@@ -68,6 +68,8 @@ window.locales['ar'] = {
   "readingProgressLabel": "تقدم القراءة",
   "autoScrollLabel": "التمرير التلقائي",
   "selectLanguage": "تحديد اللغة",
+  "textReplaceLabel": "استبدال النص",
+  "textReplaceHint": "تُحذف الأحرف المدرجة هنا من النص قبل القراءة (لا يؤثر على العرض)",
   "nowPlaying": "قيد التشغيل",
   "readingPlaylist": "قائمة القراءة",
   "navRead": "استماع",

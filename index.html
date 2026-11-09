@@ -667,6 +667,34 @@
 
         select.native-select option { background: var(--surface-strong); color: var(--text); }
 
+        input.strip-chars-input {
+            width: 100%;
+            height: 42px;
+            padding: 0 13px;
+            border-radius: 13px;
+            border: 1px solid var(--border);
+            background-color: var(--surface-soft);
+            color: var(--text);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input.strip-chars-input::placeholder { color: var(--text-faint); }
+
+        input.strip-chars-input:focus {
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.14);
+        }
+
+        .field-hint {
+            display: block;
+            margin-top: 6px;
+            font-size: 11.5px;
+            color: var(--text-faint);
+        }
+
         .switch-row {
             display: flex;
             align-items: center;
@@ -1771,6 +1799,14 @@
                             </div>
 
                             <div>
+                                <label class="field-label" for="strip-chars-input">
+                                    <span data-i18n="textReplaceLabel"></span>
+                                </label>
+                                <input type="text" id="strip-chars-input" class="strip-chars-input" value="#*`" spellcheck="false" autocomplete="off" autocapitalize="off" data-i18n-title="textReplaceHint">
+                                <small class="field-hint" data-i18n="textReplaceHint"></small>
+                            </div>
+
+                            <div>
                                 <span class="field-label"><span data-i18n="themeToggleTitle"></span></span>
                                 <button type="button" class="btn btn-ghost" style="width: 100%;" data-theme-toggle data-i18n-aria-label="themeToggleTitle" aria-pressed="false">
                                     <i class="fa fa-moon-o" aria-hidden="true"></i>
@@ -2118,6 +2154,7 @@ const voiceSearch = document.getElementById('voice-search');
 const languageSelect = document.getElementById('language-select');
 const languageList = document.getElementById('language-list');
 const autoScrollToggle = document.getElementById('auto-scroll-toggle');
+const stripCharsInput = document.getElementById('strip-chars-input');
 const copyBtn = document.getElementById('copy-btn');
 const clearBtn = document.getElementById('clear-btn');
 const sidebarSummary = document.getElementById('sidebar-summary');
@@ -2315,7 +2352,9 @@ const fallbackTranslations = {
     unsupportedFileError: 'Unsupported file format. Supported: txt, md, markdown, rtf, tex, latex, log, nfo',
     noSupportedFilesError: 'No supported files were found',
     emptyFileError: 'The file is empty',
-    currentSentenceShort: 'Sentence {current} / {total}'
+    currentSentenceShort: 'Sentence {current} / {total}',
+    textReplaceLabel: 'Text Replacement',
+    textReplaceHint: 'Characters listed here are removed from the text before reading'
 };
 
 function getTranslation(key, defaultValue = '') {
@@ -2367,7 +2406,8 @@ function loadUserState() {
         rate: 1,
         language: '',
         darkMode: true,
-        autoScroll: true
+        autoScroll: true,
+        stripChars: '#*`'
     };
 
     try {
@@ -2396,7 +2436,8 @@ function loadUserState() {
             rate: Number.isFinite(parsedRate) ? Math.min(2, Math.max(0.5, parsedRate)) : 1,
             language: typeof parsed.language === 'string' ? parsed.language : '',
             darkMode: typeof parsed.darkMode === 'boolean' ? parsed.darkMode : defaults.darkMode,
-            autoScroll: parsed.autoScroll !== false
+            autoScroll: parsed.autoScroll !== false,
+            stripChars: typeof parsed.stripChars === 'string' ? parsed.stripChars : defaults.stripChars
         };
     } catch (error) {
         console.warn('Unable to restore saved user state:', error);
@@ -2431,7 +2472,8 @@ function saveUserStateNow() {
         rate: currentRate,
         language: languageSelect.value || savedUserState.language,
         darkMode: document.documentElement.classList.contains('dark'),
-        autoScroll: autoScrollToggle.checked
+        autoScroll: autoScrollToggle.checked,
+        stripChars: stripCharsInput.value
     };
 
     try {
@@ -2488,6 +2530,7 @@ function restoreUserInterfaceState() {
 
     setRate(savedUserState.rate, false, true);
     autoScrollToggle.checked = savedUserState.autoScroll;
+    stripCharsInput.value = savedUserState.stripChars;
     applyTheme(savedUserState.darkMode, false);
     isStateInitialized = true;
 }
@@ -3115,6 +3158,21 @@ function updateTopBar() {
 /* =========================================================
    playback
    ========================================================= */
+let stripCharsCache = { value: null, regex: null };
+
+function getSpeechText(text) {
+    const value = stripCharsInput.value;
+    if (!value) {
+        return text;
+    }
+    if (!stripCharsCache.regex || stripCharsCache.value !== value) {
+        const chars = Array.from(new Set(value.replace(/\s+/g, '')));
+        const escaped = chars.map(ch => (ch === '\\' || ch === ']' || ch === '^' || ch === '-' ? '\\' + ch : ch)).join('');
+        stripCharsCache = { value, regex: chars.length ? new RegExp('[' + escaped + ']', 'g') : null };
+    }
+    return stripCharsCache.regex ? text.replace(stripCharsCache.regex, '') : text;
+}
+
 function speakCurrentSentence() {
     if (playbackState !== 'playing') {
         return;
@@ -3128,15 +3186,16 @@ function speakCurrentSentence() {
     const sentenceIndex = currentSentenceIndex;
     const textElement = sentences[sentenceIndex]?.querySelector('.sentence-text');
     const sentenceText = textElement ? textElement.textContent.trim() : '';
+    const speechText = getSpeechText(sentenceText);
 
-    if (!sentenceText) {
+    if (!speechText) {
         currentSentenceIndex += 1;
         speakCurrentSentence();
         return;
     }
 
     const session = speechSessionId;
-    const utterance = new SpeechSynthesisUtterance(sentenceText);
+    const utterance = new SpeechSynthesisUtterance(speechText);
     const selectedVoice = getSelectedVoice();
 
     if (selectedVoice) {
@@ -4418,6 +4477,11 @@ autoScrollToggle.addEventListener('change', () => {
     if (autoScrollToggle.checked) {
         centerCurrentSentence(true, true);
     }
+});
+
+// ---- strip chars ----
+stripCharsInput.addEventListener('input', () => {
+    scheduleUserStateSave();
 });
 
 // ---- lyrics click + drag ----

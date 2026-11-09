@@ -68,6 +68,8 @@ window.locales['de'] = {
   "readingProgressLabel": "Lesefortschritt",
   "autoScrollLabel": "Automatisch scrollen",
   "selectLanguage": "Sprache auswählen",
+  "textReplaceLabel": "Textersetzung",
+  "textReplaceHint": "Die angegebenen Zeichen werden vor dem Vorlesen aus dem Text entfernt (Anzeige bleibt unverändert)",
   "nowPlaying": "Wird gelesen",
   "readingPlaylist": "Leseliste",
   "navRead": "Anhören",

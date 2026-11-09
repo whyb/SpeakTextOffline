@@ -68,6 +68,8 @@ window.locales['ja'] = {
   "readingProgressLabel": "朗読の進捗",
   "autoScrollLabel": "自動スクロール",
   "selectLanguage": "言語を選択",
+  "textReplaceLabel": "テキスト置換",
+  "textReplaceHint": "ここに入力した文字は、読み上げ前にテキストから削除されます（表示には影響しません）",
   "nowPlaying": "再生中",
   "readingPlaylist": "読み上げリスト",
   "navRead": "読み上げ",

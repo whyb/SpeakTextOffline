@@ -68,6 +68,8 @@ window.locales['es'] = {
   "readingProgressLabel": "Progreso de lectura",
   "autoScrollLabel": "Desplazamiento automático",
   "selectLanguage": "Seleccionar Idioma",
+  "textReplaceLabel": "Reemplazo de texto",
+  "textReplaceHint": "Los caracteres listados aquí se eliminan del texto antes de la lectura (no afecta a la visualización)",
   "nowPlaying": "Reproduciendo",
   "readingPlaylist": "Lista de lectura",
   "navRead": "Escuchar",

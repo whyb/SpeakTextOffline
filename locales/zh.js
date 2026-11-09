@@ -68,6 +68,8 @@ window.locales['zh'] = {
   "readingProgressLabel": "朗读进度",
   "autoScrollLabel": "自动滚动",
   "selectLanguage": "选择语言",
+  "textReplaceLabel": "文本替换",
+  "textReplaceHint": "朗读前会从文本中删除这里列出的字符（不影响显示内容）",
   "nowPlaying": "正在播放",
   "readingPlaylist": "朗读列表",
   "navRead": "朗读",

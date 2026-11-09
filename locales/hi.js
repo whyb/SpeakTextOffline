@@ -68,6 +68,8 @@ window.locales['hi'] = {
   "readingProgressLabel": "पढ़ने की प्रगति",
   "autoScrollLabel": "स्वचालित स्क्रॉल",
   "selectLanguage": "भाषा चुनें",
+  "textReplaceLabel": "टेक्स्ट रिप्लेसमेंट",
+  "textReplaceHint": "यहाँ सूचीबद्ध वर्ण पढ़ने से पहले टेक्स्ट से हटा दिए जाते हैं (दृश्य प्रभावित नहीं होता)",
   "nowPlaying": "अभी चल रहा है",
   "readingPlaylist": "पठन सूची",
   "navRead": "सुनें",

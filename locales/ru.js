@@ -68,6 +68,8 @@ window.locales['ru'] = {
   "readingProgressLabel": "Прогресс чтения",
   "autoScrollLabel": "Автопрокрутка",
   "selectLanguage": "Выбрать язык",
+  "textReplaceLabel": "Замена текста",
+  "textReplaceHint": "Указанные здесь символы удаляются из текста перед озвучиванием (отображение не меняется)",
   "nowPlaying": "Сейчас читается",
   "readingPlaylist": "Список чтения",
   "navRead": "Чтение",

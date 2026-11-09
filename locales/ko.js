@@ -68,6 +68,8 @@ window.locales['ko'] = {
   "readingProgressLabel": "읽기 진행률",
   "autoScrollLabel": "자동 스크롤",
   "selectLanguage": "언어 선택",
+  "textReplaceLabel": "텍스트 치환",
+  "textReplaceHint": "여기에 입력한 문자는 읽기 전에 텍스트에서 삭제됩니다(화면 표시에는 영향을 주지 않습니다)",
   "nowPlaying": "재생 중",
   "readingPlaylist": "읽기 목록",
   "navRead": "읽기",
